@@ -6,14 +6,19 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/10 11:27:48 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/10 11:28:23 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/10 11:31:14 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include <string.h>
 
 int main ()
 {
-	printf("You're simply the best\n");
+	char a[] = "You're simply the best\n";
+	int i;
+
+	for (i = 0; i < strlen(a); i++)
+		write(1, &a[i], 1);
 	return (0);
 }
