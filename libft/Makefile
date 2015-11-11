@@ -6,7 +6,7 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/11/03 13:32:44 by rcrisan           #+#    #+#              #
-#    Updated: 2015/11/09 19:14:58 by rcrisan          ###   ########.fr        #
+#    Updated: 2015/11/11 17:52:05 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ ft_isalpha.c   ft_memset.c	   ft_strclr.c     ft_strmap.c     ft_strtrim.c\
 ft_isascii.c   ft_putchar.c    ft_strcmp.c     ft_strmapi.c    ft_tolower.c\
 ft_isdigit.c   ft_putchar_fd.c ft_strcpy.c     ft_strncat.c    ft_toupper.c\
 ft_isprint.c   ft_putendl.c    ft_strdel.c     ft_strncmp.c    ft_itoa.c\
-ft_memalloc.c  ft_putendl_fd.c ft_strdup.c     ft_strncpy.c\
+ft_memalloc.c  ft_putendl_fd.c ft_strdup.c     ft_strncpy.c    ft_strsplit.c\
 
 OBJ = $(SRCS:.c=.o)
 
