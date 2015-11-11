@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/11 11:53:10 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/11 12:49:41 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/11 13:30:45 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int		is_prime(int n)
 int main ()
 {
 	unsigned int n[6]; //= { 62, 8, 41, 23, 64, 36, 12};
-	int i = 0;
+	int i = 0, dc = 0, rez = 0;
 	int size = sizeof(n) / sizeof(n[i]);
 	while (i < size)
 	{
@@ -66,9 +66,11 @@ int main ()
 	i = 0;
 	while (i < size - 1)
 	{
-		printf("\nCMMDC a lui %d si %d este : %d\n",n[i], n[i + 1], cmmdc(n[i], n[i + 1]));
+		dc = cmmdc(n[i], n[i + 1]);
+		rez = cmmdc(dc, n[i + 1]);
 		i++;
 	}
+	printf("CMMDC al tuturor elementelor din vector este: %d\n", rez);
 	i = 0;
 	while (i < size - 1)
 	{
@@ -81,7 +83,7 @@ int main ()
 	while (i < size - 1)
 	{
 		if (is_prime(n[i]) == 1 && is_prime(n[i + 1]) == 1)
-			printf("Perechea aceasta de numere contine numere prime: |%d|, |%d|\n", n[i], n[i + 1]);
+			printf("\nPerechea aceasta de numere contine numere prime: |%d|, |%d|\n", n[i], n[i + 1]);
 		i++;
 	}
 	return (0);
