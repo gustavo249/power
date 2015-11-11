@@ -6,47 +6,11 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/10 11:27:48 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/11 11:46:18 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/11 12:50:47 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdio.h>
-
-void	ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
-
-void	ft_putstr(char *str)
-{
-	int i = 0;
-
-	while (str[i])
-	{
-		ft_putchar(str[i]);
-		i++;
-	}
-}
-
-void	ft_putnbr(int nb)
-{
-	if (nb == -2147483648)
-		ft_putstr("-2147483648");
-	if (nb < 0)
-	{
-		ft_putchar('-');
-		nb = -nb;
-	}
-	else if (nb >= 10)
-	{
-		ft_putnbr(nb / 10);
-		ft_putnbr(nb % 10);
-
-	}
-	else
-		ft_putchar(nb + '0');
-}
 
 int		is_prime(int n)
 {
@@ -97,7 +61,7 @@ int main ()
 			ok++;
 		}
 		if (invers(start) == 1)
-			printf("\t\t\t\t\t\t\t\t\t\t%d\n", start);
+			printf("\t\t\t\t\t\t\t\t\t\t%d\n", start); // afisam numerele ale caror invers e prim
 	start++;
 	}
 	if (ok == 0)
