@@ -1,26 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_space_remove.c                                  :+:      :+:    :+:   */
+/*   ft_count_words.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/12 18:17:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 19:06:32 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 18:53:28 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 19:06:11 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static char	*ft_space_remove(char *str)
+static int		ft_count_words(char *str)
 {
 	int		i;
+	int		words;
 
 	i = 0;
+	words = 0;
 	while (str[i])
-		if (str[i] == ' ' || str[i] == '\t')
-			ft_strcpy(str + i, str + i + 1);
-		else
+	{
+		while (str[i] && (str[i] == ' ' || str[i] == '\t'))
 			i++;
-	return (str);
+		while (str[i] && str[i] != ' ')
+			i++;
+		if (str[i - 1] != ' ' || str[i])
+			words++;
+		i++;
+	}
+	return (words);
 }

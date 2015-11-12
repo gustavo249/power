@@ -1,26 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_space_remove.c                                  :+:      :+:    :+:   */
+/*   ft_ulstr.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/12 18:17:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 19:06:32 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 19:10:38 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 19:17:10 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static char	*ft_space_remove(char *str)
+static char	*ft_ulstr(char *str)
 {
-	int		i;
+	int i;
 
 	i = 0;
 	while (str[i])
-		if (str[i] == ' ' || str[i] == '\t')
-			ft_strcpy(str + i, str + i + 1);
-		else
-			i++;
+	{
+		if (str[i] >= 'A' && str[i] <= 'Z')
+			str[i] = str[i] + 32;
+		else if (str[i] >= 'a' && str[i] <= 'z')
+			str[i] = str[i] - 32;
+		i++;
+	}
 	return (str);
 }
