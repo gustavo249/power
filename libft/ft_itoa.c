@@ -3,85 +3,110 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: acovaciu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/10/31 01:47:58 by acovaciu          #+#    #+#             */
-/*   Updated: 2015/11/06 17:14:31 by acovaciu         ###   ########.fr       */
+/*   Created: 2015/11/12 19:37:45 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 19:38:05 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
 #include "libft.h"
 
-static	int		ft_nrcifre(int n)
+static char		*ft_skip_sign(char *dst, char *str, int i)
 {
-	int nr;
+	size_t j;
 
-	nr = 0;
-	while (n != 0)
+	j = 0;
+	while (j < ft_strlen(str))
 	{
-		nr++;
-		n /= 10;
+		dst[j] = str[i];
+		i--;
+		j++;
 	}
-	return (nr);
+	dst[j] = '\0';
+	return (dst);
 }
 
-static	char	*ft_strrev(char *str)
+static char		*ft_char_strrev(char c, char *str)
 {
-	int		counter;
-	int		size_str;
-	char	temp;
+	int		i;
+	size_t	j;
+	char	*dst;
 
-	counter = 0;
-	if (str[counter] == '-')
-		counter++;
-	size_str = 0;
-	while (str[size_str])
-		size_str++;
-	size_str -= 1;
-	while (counter < size_str)
+	dst = (char*)malloc(sizeof(*dst) * (ft_strlen(str) + 1));
+	i = 0;
+	while (str[i])
+		i++;
+	j = 1;
+	i--;
+	if (c == '-')
 	{
-		temp = str[size_str];
-		str[size_str] = str[counter];
-		str[counter] = temp;
-		counter++;
-		size_str--;
+		dst[0] = c;
+		while (j <= ft_strlen(str))
+		{
+			dst[j] = str[i];
+			i--;
+			j++;
+		}
+		dst[j] = '\0';
+		return (dst);
 	}
-	return (str);
+	else
+		return (ft_skip_sign(dst, str, i));
 }
 
-int				ft_valoarej(int n)
+static long		ft_nsize(long nb)
 {
-	if (n < 0)
-		return (ft_nrcifre(n) + 2);
-	return (ft_nrcifre(n) + 1);
+	long size;
+
+	size = 0;
+	if (nb < 0)
+	{
+		nb = -nb;
+		size = 1;
+	}
+	if (nb == 0)
+		return (1);
+	while (nb > 0)
+	{
+		size = size + 1;
+		nb = nb / 10;
+	}
+	return (size);
+}
+
+static char		*ft_nb_is_zero(char *v)
+{
+	v[0] = '0';
+	v[1] = '\0';
+	return (v);
 }
 
 char			*ft_itoa(int n)
 {
-	char	*str;
+	char	*v;
 	int		i;
-	int		j;
+	char	s;
+	long	nb;
 
+	nb = n;
 	i = 0;
-	if (n == 0)
-		return ("0\0");
-	if (n < 0)
+	if (!(v = (char*)malloc(sizeof(*v) * (ft_nsize(nb) + 1))))
+		return (NULL);
+	s = '+';
+	if (nb < 0)
 	{
-		str = (char*)malloc(sizeof(str) * ft_nrcifre(n) + 2);
-		str[i++] = '-';
+		nb = -nb;
+		s = '-';
 	}
-	else
-		str = (char*)malloc(sizeof(str) * ft_nrcifre(n) + 1);
-	j = ft_valoarej(n);
-	str[j] = '\0';
-	while (i < j && n != 0)
+	if (nb == 0)
+		return (ft_nb_is_zero(v));
+	while (nb > 0)
 	{
-		str[i] = n % 10 + '0';
-		if (n < 0)
-			str[i] = -(n % 10) + '0';
-		n = n / 10;
+		v[i] = nb % 10 + '0';
+		nb = nb / 10;
 		i++;
 	}
-	return (ft_strrev(str));
+	v[i] = '\0';
+	return (ft_char_strrev(s, v));
 }
