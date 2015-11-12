@@ -1,40 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strtrim.c                                       :+:      :+:    :+:   */
+/*   ft_lstadd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/02 13:43:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 16:37:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 16:53:13 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 17:25:00 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s)
+void	ft_lstadd(t_list **alst, t_list *new)
 {
-	int		i;
-	int		j;
-	int		k;
-	char	*str;
-
-	i = 0;
-	k = 0;
-	str = (char*)malloc(sizeof(s) * (ft_strlen(s)));
-	if (str == NULL)
-		return (NULL);
-	while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n')
-		i++;
-	j = ft_strlen(s);
-	while (s[j - 1] == ' ' || s[j - 1] == '\t' || s[j - 1] == '\n')
-		j--;
-	while (i < j)
-	{
-		str[k] = s[i];
-		k++;
-		i++;
-	}
-	str[k] = '\0';
-	return (str);
+	new->next = *alst;
+	*alst = new;
 }

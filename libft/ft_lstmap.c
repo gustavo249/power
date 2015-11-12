@@ -1,40 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strtrim.c                                       :+:      :+:    :+:   */
+/*   ft_lstmap.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/02 13:43:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 16:37:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 17:30:39 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 17:58:44 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s)
+t_list	*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem))
 {
-	int		i;
-	int		j;
-	int		k;
-	char	*str;
+	t_list	*new;
+	t_list	*tmp;
 
-	i = 0;
-	k = 0;
-	str = (char*)malloc(sizeof(s) * (ft_strlen(s)));
-	if (str == NULL)
+	tmp = f(lst);
+	new = tmp;
+	if (new == NULL)
 		return (NULL);
-	while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n')
-		i++;
-	j = ft_strlen(s);
-	while (s[j - 1] == ' ' || s[j - 1] == '\t' || s[j - 1] == '\n')
-		j--;
-	while (i < j)
+	while (lst->next)
 	{
-		str[k] = s[i];
-		k++;
-		i++;
+		lst = lst->next;
+		tmp->next = f(lst);
+		if (tmp->next == NULL)
+			return (NULL);
+		tmp = tmp->next;
 	}
-	str[k] = '\0';
-	return (str);
+	return (new);
 }

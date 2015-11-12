@@ -1,40 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strtrim.c                                       :+:      :+:    :+:   */
+/*   ft_space_remove.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/02 13:43:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 16:37:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 18:17:44 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 18:51:26 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s)
+char	*ft_space_remove(char *str)
 {
 	int		i;
-	int		j;
-	int		k;
-	char	*str;
 
 	i = 0;
-	k = 0;
-	str = (char*)malloc(sizeof(s) * (ft_strlen(s)));
-	if (str == NULL)
-		return (NULL);
-	while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n')
-		i++;
-	j = ft_strlen(s);
-	while (s[j - 1] == ' ' || s[j - 1] == '\t' || s[j - 1] == '\n')
-		j--;
-	while (i < j)
-	{
-		str[k] = s[i];
-		k++;
-		i++;
-	}
-	str[k] = '\0';
+	while (str[i])
+		if (str[i] == ' ' || str[i] == '\t')
+			ft_strcpy(str + i, str + i + 1);
+		else
+			i++;
 	return (str);
 }

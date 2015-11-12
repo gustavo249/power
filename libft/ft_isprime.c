@@ -1,40 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strtrim.c                                       :+:      :+:    :+:   */
+/*   ft_isprime.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/02 13:43:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 16:37:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/11/12 17:59:43 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/11/12 18:14:02 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s)
+static int		ft_isprime(int n)
 {
-	int		i;
-	int		j;
-	int		k;
-	char	*str;
+	int c;
 
-	i = 0;
-	k = 0;
-	str = (char*)malloc(sizeof(s) * (ft_strlen(s)));
-	if (str == NULL)
-		return (NULL);
-	while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n')
-		i++;
-	j = ft_strlen(s);
-	while (s[j - 1] == ' ' || s[j - 1] == '\t' || s[j - 1] == '\n')
-		j--;
-	while (i < j)
+	c = 2;
+	while (c * c <= n)
 	{
-		str[k] = s[i];
-		k++;
-		i++;
+		if (n % c == 0)
+			return (0);
+		c++;
 	}
-	str[k] = '\0';
-	return (str);
+	return (1);
 }
