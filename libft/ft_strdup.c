@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/23 18:48:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/03 15:38:32 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/14 12:25:21 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,18 @@
 
 char	*ft_strdup(const char *s1)
 {
-	int		i;
-	char	*temp;
+	size_t		i;
+	char		*temp;
+	size_t		sum;
 
-	i = 0;
-	while (s1[i])
-		i++;
-	temp = (char*)malloc(sizeof(char) * (i + 1));
+	if (s1 == NULL)
+		return (NULL);
+	sum = ft_strlen(s1);
+	temp = (char*)malloc(sizeof(*temp) * (sum + 1));
 	if (temp == NULL)
 		return (NULL);
 	i = 0;
-	while (s1[i])
+	while (i < sum)
 	{
 		temp[i] = s1[i];
 		i++;

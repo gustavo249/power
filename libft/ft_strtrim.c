@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/02 13:43:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/12 16:37:40 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/14 11:49:50 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ char	*ft_strtrim(char const *s)
 
 	i = 0;
 	k = 0;
+	if (s == NULL)
+		return (NULL);
 	str = (char*)malloc(sizeof(s) * (ft_strlen(s)));
 	if (str == NULL)
 		return (NULL);

@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/02 11:13:35 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/02 11:43:27 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/14 12:06:04 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void	ft_strclr(char *s)
 	unsigned int i;
 
 	i = 0;
-	while (s[i])
-		i++;
+	if (s != NULL)
+		while (s[i])
+			i++;
 	ft_memset(s, 0, i);
 }
