@@ -6,13 +6,13 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 19:10:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/13 12:21:38 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/17 18:33:52 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static char	*ft_ulstr(char *str)
+char	*ft_ulstr(char *str)
 {
 	int i;
 

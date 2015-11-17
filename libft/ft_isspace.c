@@ -6,13 +6,13 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 18:07:49 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/13 12:38:11 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/17 18:33:20 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int		ft_isspace(char *str)
+int		ft_isspace(char *str)
 {
 	int i;
 

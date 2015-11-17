@@ -6,13 +6,13 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 18:17:44 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/13 12:20:10 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/17 18:33:45 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static char	*ft_space_remove(char *str)
+char	*ft_space_remove(char *str)
 {
 	int		i;
 

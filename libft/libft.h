@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/13 12:36:48 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/17 18:33:03 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,4 +80,9 @@ void				ft_putchar_fd(char c, int fd);
 void				ft_putstr_fd(char const *s, int fd);
 void				ft_putendl_fd(char const *s, int fd);
 void				ft_putnbr_fd(int n, int fd);
+int					ft_isspace(char *str);
+int					ft_isprime(int n);
+int					ft_count_words(char *str);
+char				*ft_ulstr(char *str);
+char				*ft_space_remove(char *str);
 #endif

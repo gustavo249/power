@@ -6,13 +6,13 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 17:59:43 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/13 12:33:06 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/11/17 18:33:31 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int		ft_isprime(int n)
+int		ft_isprime(int n)
 {
 	int c;
 
