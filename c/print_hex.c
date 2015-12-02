@@ -6,12 +6,13 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/28 13:18:01 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/28 13:53:11 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/12/02 14:44:12 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <stdio.h>
+#define BUFF 17
 
 int		ft_nrcifre(int n)
 {
@@ -24,6 +25,18 @@ int		ft_nrcifre(int n)
 		i++;
 	}
 	return (i);
+}
+
+void	init(char *str)
+{
+	int i;
+
+	i = 0;
+	while (i < BUFF)
+	{
+		str[i] = 0;
+		i++;
+	}
 }
 
 char	*ft_strrev(char *str)
@@ -51,9 +64,10 @@ char	*ft_strrev(char *str)
 void	print_hex(int n)
 {
 	int		i;
-	char	*str;
+	char	str[17];
 	char	*q;
-	str = (char*)malloc(sizeof(str) * ft_nrcifre(n));
+	
+	init(str);
 	q = "0123456789abcdef";
 	i = 0;
 	while (n)
