@@ -1,55 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   create_map.c                                       :+:      :+:    :+:   */
+/*   validate_size.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/04 16:52:50 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/05 14:40:50 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/12/05 14:04:10 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/12/05 15:06:49 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include "fillit.h"
 
-void	fill(char *str, char **matrix)
+int		validate_size(char *str)
 {
+	int chr;
+	int lines;
 	int i;
-	int j;
-	int k;
 
+	chr = 0;
+	lines = 0;
 	i = 0;
-	j = 0;
-	k = 0;
-	while (str[k])
+	while (str[i])
 	{
-		while (i < 4)
+		if (str[i] == '\n')
 		{
-			j = 0;
-			while (j < 5)
-			{
-				matrix[i][j] = str[k];
-				j++;
-				k++;
-			}
-			i++;
+			lines++;
+			if (chr != 4 && lines != 5 )
+				return (0);
+			if (lines == 5 && chr != 0)
+				return (0);
+			chr = 0;
 		}
-		k++;
-	}
-}
-
-char	**create_matrix(char *str)
-{
-	int		i;
-	char	**matrix;
-
-	i = 0;
-	matrix = (char**)malloc(sizeof(char*) * 5);
-	while (i < 5)
-	{
-		matrix[i] = (char*)malloc(sizeof(char) * 5);
+		else
+			chr++;
 		i++;
 	}
-	fill(str, matrix);
-	return (matrix);
+	if (lines != 5)
+		return (0);
+	return (1);
 }

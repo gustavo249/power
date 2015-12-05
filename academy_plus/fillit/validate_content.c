@@ -1,55 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   create_map.c                                       :+:      :+:    :+:   */
+/*   validate_mapsize.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/04 16:52:50 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/05 14:40:50 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/12/05 13:06:37 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/12/05 15:20:37 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include "fillit.h"
 
-void	fill(char *str, char **matrix)
+int		validate_content(char **matrix)
 {
 	int i;
 	int j;
-	int k;
+	int hashtags;
+	int points;
 
 	i = 0;
 	j = 0;
-	k = 0;
-	while (str[k])
+	points = 0;
+	hashtags = 0;
+	while (i < 4)
 	{
-		while (i < 4)
+		j = 0;
+		while (j < 5)
 		{
-			j = 0;
-			while (j < 5)
-			{
-				matrix[i][j] = str[k];
-				j++;
-				k++;
-			}
-			i++;
+			if (matrix[i][j] == '#')
+				hashtags++;
+			else if (matrix[i][j] != '.' && matrix[i][j] != '\n')
+				return (0);
+			j++;
 		}
-		k++;
-	}
-}
-
-char	**create_matrix(char *str)
-{
-	int		i;
-	char	**matrix;
-
-	i = 0;
-	matrix = (char**)malloc(sizeof(char*) * 5);
-	while (i < 5)
-	{
-		matrix[i] = (char*)malloc(sizeof(char) * 5);
 		i++;
 	}
-	fill(str, matrix);
-	return (matrix);
+	if (hashtags != 4)
+		return (0);
+	return (1);
 }
