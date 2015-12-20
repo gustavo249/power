@@ -55,7 +55,7 @@ int		get_next_line(int const fd, char **line)
 		if (result < 0)
 			return (-1);
 		else
-			text = ft_strjoin(text, "\n");
+			n_poz = ft_strjoin(text, "\n");
 	}
 	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(n_poz));
 	text = ft_strdup(n_poz + 1);
