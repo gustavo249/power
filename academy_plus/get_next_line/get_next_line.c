@@ -18,7 +18,7 @@ static int	read_buff(int const fd, char **segment)
 	int		ret;
 	char	*new_file;
 
-	buff = (char*)malloc(sizeof(buff) * BUFF_SIZE + 1);
+	buff = (char*)malloc(sizeof(*buff) * BUFF_SIZE + 1);
 	if (!buff)
 		return (-1);
 	ret = read(fd, buff, BUFF_SIZE);
@@ -55,7 +55,7 @@ int		get_next_line(int const fd, char **line)
 		if (result < 0)
 			return (-1);
 		else
-			n_poz = ft_strjoin(text, "\n");
+			n_poz = ft_strchr(text, '\n');
 	}
 	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(n_poz));
 	text = ft_strdup(n_poz + 1);
