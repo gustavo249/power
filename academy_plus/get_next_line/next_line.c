@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next.c                                         :+:      :+:    :+:   */
+/*   next_line.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/21 18:39:09 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/21 19:00:13 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/12/22 17:53:14 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/12/22 19:21:52 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
-#define BUFF_SIZE 32
+#define BUFF_SIZE 9999
 
-static int	read_buffer(int const fd, char **text)
+static int	read_untill(int const fd, char **file)
 {
 	char	*buff;
+	char	*new_file;
 	int		result;
-	char	*new;
 
 	buff = (char*)malloc(sizeof(*buff) * (BUFF_SIZE + 1));
 	if (!(buff))
@@ -32,9 +32,9 @@ static int	read_buffer(int const fd, char **text)
 	if (result > 0)
 	{
 		buff[result] = '\0';
-		new = ft_strjoin(*text, buff);
-		free(*text);
-		*text = new;
+		new_file = ft_strjoin(*file, buff);
+		free(*file);
+		*file = new_file;
 	}
 	free(buff);
 	return (result);
@@ -43,16 +43,16 @@ static int	read_buffer(int const fd, char **text)
 int			get_next_line(int const fd, char **line)
 {
 	static char		*text = NULL;
+	char			*pos_n;
 	int				result;
-	char			*n_poz;
 
 	if ((!(text) && (text = (char*)malloc(sizeof(*text))) == NULL) || !(line)
 			|| BUFF_SIZE < 0 || fd < 0)
 		return (-1);
-	n_poz = ft_strchr(text, '\n');
-	while (n_poz == NULL)
+	pos_n = ft_strchr(text, '\n');
+	while (pos_n == NULL)
 	{
-		result = read_buffer(fd, &text);
+		result = read_untill(fd, &text);
 		if (result == 0)
 		{
 			if (ft_strlen(text) == 0)
@@ -62,10 +62,10 @@ int			get_next_line(int const fd, char **line)
 		if (result < 0)
 			return (-1);
 		else
-			n_poz = ft_strchr(text, '\n');
+			pos_n = ft_strchr(text, '\n');
 	}
-	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(n_poz));
-	text = ft_strdup(n_poz + 1);
+	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(pos_n));
+	text = ft_strdup(pos_n + 1);
 	return (1);
 }
 

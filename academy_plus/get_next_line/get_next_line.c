@@ -5,55 +5,47 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/21 16:10:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/21 19:00:10 by rcrisan          ###   ########.fr       */
+/*   Created: 2015/12/22 18:47:00 by rcrisan           #+#    #+#             */
+/*   Updated: 2015/12/22 19:21:50 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "libft.h"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <errno.h>
-#define BUFF_SIZE 32
+#include "get_next_line.h"
 
-
-static int	read_untill(int const fd, char **file)
+static int	read_buff(int const fd, char **segment)
 {
-	char	*new_file;
 	char	*buff;
-	int		result;
+	int		ret;
+	char	*new_file;
 
-	buff = (char*)malloc(sizeof(*buff) * (BUFF_SIZE + 1));
-	if (!(buff))
+	buff = (char*)malloc(sizeof(buff) * BUFF_SIZE + 1);
+	if (!buff)
 		return (-1);
-	result = read(fd, buff, BUFF_SIZE);
-	while (result > 0)
+	ret = read(fd, buff, BUFF_SIZE);
+	if (ret > 0)
 	{
-		buff[result] = '\0';
-		new_file = ft_strjoin(*file, buff);
-		free(*file);
-		*file = new_file;
+		buff[ret] = '\0';
+		new_file = ft_strjoin(*segment, buff);
+		free(*segment);
+		*segment = new_file;
 	}
 	free(buff);
-	return (result);
+	return (ret);
 }
 
-int			get_next_line(int const fd, char **line)
+int		get_next_line(int const fd, char **line)
 {
-	static char	*text = NULL;
-	int			result;
-	char		*pos_n;
-	
+	static char		*text = NULL;
+	char			*n_poz;
+	int				result;
+
 	if ((!(text) && (text = (char*)malloc(sizeof(*text))) == NULL) || !(line)
-			|| BUFF_SIZE < 0 || fd < 0)
+			            || BUFF_SIZE < 0 || fd < 0)
 		return (-1);
-	pos_n = ft_strchr(text, '\n');
-	while (pos_n == NULL)
+	n_poz = ft_strchr(text, '\n');
+	while (n_poz == NULL)
 	{
-		result = read_untill(fd, &text);
+		result = read_buff(fd, &text);
 		if (result == 0)
 		{
 			if (ft_strlen(text) == 0)
@@ -63,27 +55,27 @@ int			get_next_line(int const fd, char **line)
 		if (result < 0)
 			return (-1);
 		else
-			pos_n = ft_strchr(text, '\n');
+			text = ft_strjoin(text, "\n");
 	}
-	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(pos_n));
-	text = ft_strdup(pos_n + 1);
+	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(n_poz));
+	text = ft_strdup(n_poz + 1);
 	return (1);
 }
 
 int main ()
 {
-	char *s;
+	char *line;
 	int fd;
-	int line;
+	int ret;
 
 	fd = open("42.txt", O_RDONLY);
 	if (fd < 0)
 		return (-1);
-	while ((line = get_next_line(fd, &s)))
+	while ((ret = get_next_line(fd, &line)))
 	{
-		ft_putstr(s);
+		ft_putstr(line);
 		ft_putchar('\n');
-		free(s);
+		free(line);
 	}
 	return (0);
 }
