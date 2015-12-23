@@ -61,21 +61,3 @@ int		get_next_line(int const fd, char **line)
 	text = ft_strdup(n_poz + 1);
 	return (1);
 }
-
-int main ()
-{
-	char *line;
-	int fd;
-	int ret;
-
-	fd = open("42.txt", O_RDONLY);
-	if (fd < 0)
-		return (-1);
-	while ((ret = get_next_line(fd, &line)))
-	{
-		ft_putstr(line);
-		ft_putchar('\n');
-		free(line);
-	}
-	return (0);
-}

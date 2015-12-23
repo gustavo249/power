@@ -10,15 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-#include "libft.h"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <errno.h>
-#define BUFF_SIZE 32
+#ifndef __GET_NEXT_LINE_H
+# define __GET_NEXT_LINE_H
+# include "libft/libft.h"
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <stdlib.h>
+# include <errno.h>
+# define BUFF_SIZE 32
 
 int     get_next_line(int const fd, char **line);
 
