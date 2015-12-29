@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/22 18:47:00 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/22 19:21:50 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/12/28 12:29:01 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,14 @@ static int	read_buff(int const fd, char **segment)
 	return (ret);
 }
 
-int		get_next_line(int const fd, char **line)
+int			get_next_line(int const fd, char **line)
 {
 	static char		*text = NULL;
 	char			*n_poz;
 	int				result;
 
 	if ((!(text) && (text = (char*)malloc(sizeof(*text))) == NULL) || !(line)
-			            || BUFF_SIZE < 0 || fd < 0)
+			|| BUFF_SIZE < 0 || fd < 0)
 		return (-1);
 	n_poz = ft_strchr(text, '\n');
 	while (n_poz == NULL)

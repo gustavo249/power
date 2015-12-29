@@ -6,7 +6,7 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/11/03 13:32:44 by rcrisan           #+#    #+#              #
-#    Updated: 2015/11/17 18:30:22 by rcrisan          ###   ########.fr        #
+#    Updated: 2015/12/29 12:49:09 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ OBJ = $(SRCS:.c=.o)
 all: $(NAME)
 
 $(NAME):
-	@gcc -c -Wall -Wextra -Werror $(SRCS)
+	@gcc -c -I./includes -Wall -Wextra -Werror $(SRCS)
 	@ar rc $(NAME) $(OBJ)
 	@ranlib $(NAME)
 
