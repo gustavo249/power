@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/22 18:47:00 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/22 19:21:50 by rcrisan          ###   ########.fr       */
+/*   Updated: 2015/12/28 12:29:01 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	read_buff(int const fd, char **segment)
 	int		ret;
 	char	*new_file;
 
-	buff = (char*)malloc(sizeof(buff) * BUFF_SIZE + 1);
+	buff = (char*)malloc(sizeof(*buff) * BUFF_SIZE + 1);
 	if (!buff)
 		return (-1);
 	ret = read(fd, buff, BUFF_SIZE);
@@ -33,14 +33,14 @@ static int	read_buff(int const fd, char **segment)
 	return (ret);
 }
 
-int		get_next_line(int const fd, char **line)
+int			get_next_line(int const fd, char **line)
 {
 	static char		*text = NULL;
 	char			*n_poz;
 	int				result;
 
 	if ((!(text) && (text = (char*)malloc(sizeof(*text))) == NULL) || !(line)
-			            || BUFF_SIZE < 0 || fd < 0)
+			|| BUFF_SIZE < 0 || fd < 0)
 		return (-1);
 	n_poz = ft_strchr(text, '\n');
 	while (n_poz == NULL)
@@ -55,27 +55,9 @@ int		get_next_line(int const fd, char **line)
 		if (result < 0)
 			return (-1);
 		else
-			n_poz = ft_strjoin(text, "\n");
+			n_poz = ft_strchr(text, '\n');
 	}
 	*line = ft_strsub(text, 0, ft_strlen(text) - ft_strlen(n_poz));
 	text = ft_strdup(n_poz + 1);
 	return (1);
-}
-
-int main ()
-{
-	char *line;
-	int fd;
-	int ret;
-
-	fd = open("42.txt", O_RDONLY);
-	if (fd < 0)
-		return (-1);
-	while ((ret = get_next_line(fd, &line)))
-	{
-		ft_putstr(line);
-		ft_putchar('\n');
-		free(line);
-	}
-	return (0);
 }
