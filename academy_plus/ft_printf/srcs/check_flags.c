@@ -1,25 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   check_flags.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/05 19:46:50 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/05 19:09:17 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/05 19:42:20 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int main ()
+t_mod	check_flags(char *format)
 {
 	t_mod flag;
-	char *format = "mama are mere";
+	int i;
 
-	flag = check_flags(format);
-	ft_printf_noflags(format, flag);
-	printf("\n%d\n", flag.procent);
-	printf("%d", 42);
-	return (0);
+	i = 0;
+	while (format[i])
+	{
+		if (format[i] == '%')
+			flag.procent = 1;
+		i++;
+	}
+	return (flag);
 }

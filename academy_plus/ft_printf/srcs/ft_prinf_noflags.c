@@ -1,25 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/05 19:46:50 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/05 18:11:54 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/05 19:19:08 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int main ()
+void	ft_printf_noflags(char *format, t_mod flag)
 {
-	t_mod flag;
-	char *format = "mama are mere";
-
-	flag = check_flags(format);
-	ft_printf_noflags(format, flag);
-	printf("\n%d\n", flag.procent);
-	printf("%d", 42);
-	return (0);
+	if (flag.procent == 0)
+		ft_putstr(format);
 }
