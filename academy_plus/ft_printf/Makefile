@@ -6,7 +6,7 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/01/04 19:15:51 by rcrisan           #+#    #+#              #
-#    Updated: 2016/01/04 19:58:16 by rcrisan          ###   ########.fr        #
+#    Updated: 2016/01/05 13:01:27 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,14 +24,15 @@ OBJ = *.o
 all: $(NAME)
 
 $(NAME):
-	@$(CC) -c $(SRCS)
+	@$(CC) -c $(SRCS) -I./includes
 	@ar rc $(NAME) $(OBJ)
 	@ranlib $(NAME)
+	@$(CC) -I./includes main.c -L. -lftprintf -o printf
 
 clean:
 	@rm -rf $(OBJ)
 
 fclean: clean
-	@rm -rf $(NAME)
+	@rm -rf $(NAME) printf
 
 re: fclean all

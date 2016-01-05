@@ -1,22 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/05 15:21:55 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/05 14:59:19 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#ifndef FT_PRINTF_H
+# define FT_PRINTF_H
 
-int main ()
-{
-	int a;
+#include <stdio.h>
+#include <stdarg.h>
+#include "../libft/libft.h"
 
-	a = get_width("mama are mere%342restart");
-	printf("%d\n", a);
-	return (1);
-}
+int		get_width(char *format);
+
+#endif
