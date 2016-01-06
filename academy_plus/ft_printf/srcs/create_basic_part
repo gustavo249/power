@@ -1,19 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   create_basic_part.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/05 18:11:54 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 12:02:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/06 10:48:02 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/06 12:03:26 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void	ft_printf_noflags(char *format, t_mod *flag)
+char	*create_part(char *format, t_mod *flag)
 {
-	if (flag->procent == 0)
-		ft_putstr(format);
+	int i;
+	char part[100];
+
+	i = 0;
+	if (flag.procent == 0)
+		return (NULL);
+	while (flag_is_valid(format, flag))
+	{
+		if (identifier_is_not(format, flag) == 1)
+			part[k++] = format[i++];
+		else if (identifier_is_not(format, flag) == 0)
+			break;
+	}
+	return (part);
 }

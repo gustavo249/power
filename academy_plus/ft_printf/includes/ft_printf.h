@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/05 19:53:43 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/06 15:13:22 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,13 @@
 #include <stdarg.h>
 #include "../libft/libft.h"
 
-#define FLAGS "0123456789 hljz+-.#0"
+#define FLAGS "-+ #0"
+
+#define WIDTH "0123456789"
+
+#define PRECISION ".0123456789"
+
+#define SPECIFIERS "sSpdDioOuUxXcC"
 
 typedef struct	s_mod
 {
@@ -33,7 +39,7 @@ typedef struct	s_mod
 	int		zero_mod;
 	int		plus_mod;
 	int		space_mod;
-	char	flag;
+	char	identifier;
 	int		width;
 	int		precision;
 	int		procent;
@@ -42,7 +48,12 @@ typedef struct	s_mod
 
 
 int		get_width(char *format);
-void	ft_printf_noflags(char *format, t_mod flag);
-t_mod	check_flags(char *format);
+void	ft_printf_noflags(char *format, t_mod *flag);
+
+void	init_flags(t_mod *flag);
+void	check_procent(char *format, t_mod *flag);
+void	check_flags(char *format, t_mod *flag);
+void	check_flags2(char *format, t_mod *flag);
+
 
 #endif

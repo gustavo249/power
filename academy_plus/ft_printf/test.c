@@ -1,19 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/05 18:11:54 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 12:02:40 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/06 12:55:02 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/06 15:13:00 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include <stdio.h>
 
-void	ft_printf_noflags(char *format, t_mod *flag)
+int main (void)
 {
-	if (flag->procent == 0)
-		ft_putstr(format);
+	int c = 1000000000;
+	char *s = "copac";
+	printf("%- 32d<<<", c);
+	return (0);
 }
