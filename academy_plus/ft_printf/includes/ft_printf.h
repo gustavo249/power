@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 19:29:03 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/08 19:49:42 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "../libft/libft.h"
+#include <string.h>
 
-#define FLAGS "0123456789 -+#0."
+#define FLAGS "0123456789 -+#0.hljz"
 
 #define SPECIFIERS "sSpdDioOuUxXcC"
 
@@ -39,6 +40,9 @@ typedef struct	s_mod
 	int		width;
 	int		precision;
 	int		procent;
+	int		hast_size;
+	int		width_size;
+	int		precision_size;
 
 }				t_mod;
 
