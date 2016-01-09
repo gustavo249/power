@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/09 13:25:12 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/09 16:33:52 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,14 +103,12 @@ void	process_hhll_mods(char	*choped, t_mod	*data)
 	i = 0;
 	while (choped[i])
 	{
-		if (choped[i] == 'h' && choped[i + 1] == 'h' && \
-				strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		if (choped[i] == 'h' && choped[i + 1] == 'h')
 		{
 			data->hh_mod = 1;
 			data->h_mod = 0;
 		}
-		else if (choped[i] == 'l' && choped[i + 1] == 'l' && \
-				strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		else if (choped[i] == 'l' && choped[i + 1] == 'l')
 		{
 			data->ll_mod = 1;
 			data->l_mod = 0;
@@ -126,15 +124,13 @@ void	process_mods(char *choped, t_mod *data)
 	i = 0;
 	while (choped[i])
 	{
-		if (choped[i] == 'h' && choped[i + 1] != 'h' && \
-				strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		if (choped[i] == 'h' && choped[i + 1] != 'h')
 			data->h_mod = 1;
-		else if (choped[i] == 'l' && choped[i + 1] != 'l' && \
-			strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		else if (choped[i] == 'l' && choped[i + 1] != 'l')
 			data->l_mod = 1;
-		else if (choped[i] == 'j' && strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		else if (choped[i] == 'j')
 			data->j_mod = 1;
-		else if (choped[i] == 'z' && strchr(SPECIFIERS, choped[i + 1]) != NULL)
+		else if (choped[i] == 'z')
 			data->z_mod = 1;
 		i++;
 	}
@@ -148,18 +144,35 @@ int		is_mod(char c)
 	return (0);
 }
 
-int		mod_is_valid(char *choped)
+int		is_double_mod(char	*choped, int *i)
+{
+	int k;
+
+	k = *i;
+	printf("%d\n", k);
+	if (choped[k] == 'h' && choped[k + 1] == 'h')
+		return (1);
+	else if (choped[k] == 'l' && choped[k + 1] == 'l')
+		return (1);
+	return (0);
+}
+
+int		validate_mod(char *choped)
 {
 	int i;
 
 	i = 0;
 	while (choped[i])
 	{
-		if (is_mod(choped[i]) && strchr(SPECIFIERS, choped[i + 1]) == NULL)
+		if (!is_double_mod(choped, &i) && is_mod(choped[i]) && \
+				strchr(SPECIFIERS, choped[i + 1]) == NULL)
+			return (-1);
+		else if (is_double_mod(choped, &i) && \
+				strchr(SPECIFIERS, choped[i + 2]) == NULL)
 			return (-1);
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
 t_mod	*process_flags(char *choped, t_mod *data)
@@ -183,7 +196,9 @@ t_mod	*process_flags(char *choped, t_mod *data)
 		i++;
 	}
 
-	process_mods(choped, data);
+	printf("MOD IS VALID =  %d\n", validate_mod(choped));
+	if (validate_mod(choped) > 0)
+		process_mods(choped, data);
 	process_precision(choped, data);
 	return (data);
 }
