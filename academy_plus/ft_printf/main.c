@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/09 16:33:52 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/09 19:02:08 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,6 @@ int		is_double_mod(char	*choped, int *i)
 	int k;
 
 	k = *i;
-	printf("%d\n", k);
 	if (choped[k] == 'h' && choped[k + 1] == 'h')
 		return (1);
 	else if (choped[k] == 'l' && choped[k + 1] == 'l')
@@ -175,6 +174,57 @@ int		validate_mod(char *choped)
 	return (1);
 }
 
+void	process_specifiers2(char *choped, t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (choped[i])
+	{
+		if (choped[i] == 'S')
+			data->specifier = 'S';
+		else if (choped[i] == 's')
+			data->specifier = 's';
+		else if (choped[i] == 'C')
+			data->specifier = 'C';
+		else if (choped[i] == 'c')
+			data->specifier = 'c';
+		else if (choped[i] == 'p')
+			data->specifier = 'p';
+		else if (choped[i] == 'X')
+			data->specifier = 'X';
+		else if (choped[i] == 'x')	
+			data->specifier = 'x';
+		i++;
+	}
+}
+
+void	process_specifiers(char *choped, t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (choped[i])
+	{
+		if (choped[i] == 'd')
+			data->specifier = 'd';
+		else if (choped[i] == 'D')
+			data->specifier = 'D';
+		else if (choped[i] == 'i')
+			data->specifier = 'i';
+		else if (choped[i] == 'o')
+			data->specifier = 'o';
+		else if (choped[i] == 'O')
+			data->specifier = 'O';
+		else if (choped[i] == 'u')
+			data->specifier = 'u';
+		else if (choped[i] == 'U')
+			data->specifier = 'U';
+		i++;
+	}
+	process_specifiers2(choped, data);
+}
+
 t_mod	*process_flags(char *choped, t_mod *data)
 {
 	int i;
@@ -195,54 +245,88 @@ t_mod	*process_flags(char *choped, t_mod *data)
 			data->space_mod = 1;
 		i++;
 	}
-
-	printf("MOD IS VALID =  %d\n", validate_mod(choped));
 	if (validate_mod(choped) > 0)
 		process_mods(choped, data);
 	process_precision(choped, data);
+	process_specifiers(choped, data);
 	return (data);
 }
-/*
-   int		what_to_print(const char *format, va_list *arg)
-   {
-   char	*text;
-   char	*choped;
-   t_mod	*data;
-   int		i;
 
-   i = -1;
-   if (strchr(format, '%') == NULL)
-   printf("%s", format);
-   while (++i < strlen(format))
-   {
-   if (format[i] == '%')
-   {
-   choped = strdup(chop_format(format, &i));
-   if (choped != NULL)
-   {
-   data = process_flags(choped, data);
-   text = ft_strdup(convert_based_on_flags(data, arg));
-   i = ft_strlen(choped) + i;
-   printf("%s", text);
-   }
-   }
-   else
-   printf("%c", format[i]);
-   }
-   return (g_size);
-   }
 
-   int		ft_printf(const char *format, ...)
-   {
-   va_list arg;
-   int done;
 
-   va_start(arg, format);
-   done = what_to_print(format, &arg);
-   va_end(arg);
-   return (done);
-   }
-   */
+char	*convert_based_on_flags(t_mod *data, va_list *arg)
+{
+	char	*text;
+
+	if (data->specifier == 'S' || data->specifier == 's' || \
+			data->specifier == 'c' || data->specifier == 'C')
+	{
+		text = strdup(convert_strings(data, arg));
+	}
+	else if (data->specifier == 'd' || data->specifier == 'D' || \
+			data->specifier == 'i' || data->specifier == 'o' || \
+			data->specifier == 'O' || data->specifier == 'u' || \
+			data->specifier == 'x' || data->specifier == 'X' || \
+			data->specifier == 'p')
+	{
+		text = strdup(convert_numbers(data, arg));
+	}
+	return (text);
+}
+
+void	if_no_procent(const char *format)
+{
+	if (strchr(format, '%') == NULL)
+		printf("%s", format);
+}
+
+void	how_much_to_print(char	*choped, char *text, t_mod *data)
+{
+	int length;
+
+	length = get_size(choped, data);
+	ft_putnstr(text, length);
+}
+
+int		what_to_print(const char *format, va_list *arg)
+{
+	char	*text;
+	char	*choped;
+	t_mod	*data;
+	int		i;
+	
+	i = -1;
+	if_no_procent(format);
+	while (++i < strlen(format))
+	{
+		if (format[i] == '%' && format[i + 1] != '%')
+		{
+			choped = strdup(chop_format(format, &i));
+			if (choped != NULL)
+			{
+				data = process_flags(choped, data);
+				text = ft_strdup(convert_based_on_flags(data, arg));
+				i = ft_strlen(choped) + i;
+				how_much_to_print(choped, text, data);
+			}
+		}
+		else
+			printf("%c", format[i]);
+	}
+	return (g_size);
+}
+
+int		ft_printf(const char *format, ...)
+{
+	va_list arg;
+	int done;
+
+	va_start(arg, format);
+	done = what_to_print(format, &arg);
+	va_end(arg);
+	return (done);
+}
+
 int main (int argc, char **argv)
 {
 	//ft_printf("mama%0#m.24d are mere");
@@ -271,7 +355,7 @@ int main (int argc, char **argv)
 	printf("0 mod = %d\n", flag.zero_mod);
 	printf("+ mod = %d\n", flag.plus_mod);
 	printf("space mod = %d\n", flag.space_mod);
-	printf("specifier = %d\n", flag.specifier);
+	printf("specifier = %c\n", flag.specifier);
 	printf("width mod = %d\n", flag.width);
 	printf("precision mod = %d\n", flag.precision);
 	printf("procent mod = %d\n", flag.procent);
