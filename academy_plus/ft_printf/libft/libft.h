@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/12/21 14:28:33 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/11 17:14:12 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ char				*ft_strtrim(char const *s);
 char				**ft_strsplit(char const *s, char c);
 void				ft_putchar(char c);
 void				ft_putstr(char const *s);
+void				ft_putnstr(char *str, int len);
 void				ft_putendl(char const *s);
 void				ft_putnbr(int n);
 void				ft_putchar_fd(char c, int fd);
@@ -86,4 +87,5 @@ int					ft_count_words(char *str);
 char				*ft_ulstr(char *str);
 char				*ft_space_remove(char *str);
 int					ft_sqrt(int n);
+char				*ft_strrev(char *str);
 #endif

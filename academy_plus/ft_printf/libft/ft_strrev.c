@@ -1,26 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_procent.c                                    :+:      :+:    :+:   */
+/*   ft_strrev.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/06 11:56:36 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 12:11:13 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/11 17:12:08 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/11 17:13:42 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "libft.h"
 
-void	check_procent(char *format, t_mod *flag)
+char	*ft_strrev(char *str)
 {
 	int i;
+	int j;
+	char aux;
 
 	i = 0;
-	while (format[i])
+	j = ft_strlen(str) - 1;
+	while (i < j)
 	{
-		if (format[i] == '%')
-			flag->procent = 1;
+		aux = str[i];
+		str[i] = str[j];
+		str[j] = aux;
 		i++;
+		j--;
 	}
+	return (str);
 }

@@ -1,33 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_flags.c                                       :+:      :+:    :+:   */
+/*   ft_putnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/06 12:00:02 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 13:59:21 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/11 16:39:47 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/11 16:40:41 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "libft.h"
 
-void	init_flags(t_mod *flag)
+void	ft_putnstr(char *str, int len)
 {
-	flag->dot_mod = 0;
-	flag->h_mod = 0;
-	flag->hh_mod = 0;
-	flag->l_mod = 0;
-	flag->ll_mod = 0;
-	flag->z_mod = 0;
-	flag->j_mod = 0;
-	flag->hash_mod = 0;
-	flag->minus_mod = 0;
-	flag->zero_mod = 0;
-	flag->plus_mod = 0;
-	flag->space_mod = 0;
-	flag->width = 0;
-	flag->identifier = (char)malloc(1);
-	flag->precision = 0;
-	flag->procent = 0;
+	int i;
+
+	i = 0;
+	while (i < len)
+	{
+		write(1, &str[i], 1);
+		i++;
+	}
 }

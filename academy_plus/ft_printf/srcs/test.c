@@ -1,29 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_specifier.c                                  :+:      :+:    :+:   */
+/*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/06 19:19:15 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 19:29:43 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/11 21:03:42 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/11 21:06:13 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include <stdio.h>
 
-void	check_specifier(char *choped, t_mod *mod)
+int main (int arg, char **argv)
 {
-	int i;
-
-	i = 0;
-	while (choped[i])
-	{
-		if (ft_strchr(SPECIFIERS, choped[i] != NULL))
-		{
-			if (choped[i] == 's')
-				mod->specifier
-		}
-		i++;
-	}
+	unsigned char a = -123;
+	printf("%x\n", a);
 }
