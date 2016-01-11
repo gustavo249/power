@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 16:11:22 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/11 17:56:46 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,14 @@ char	*chop_format(const char *format, int *i)
 			return (NULL);
 		else if (is_specifier(format, &k))
 		{
-			choped[j] = format[k];
-			break ;
+			choped[j++] = format[k];
+			break;
 		}
 		else if (is_flag(format, &k))
 			choped[j++] = format[k];
 		k++;
 	}
+	choped[j] = '\0';
 	return (choped);
 }
 
@@ -256,18 +257,22 @@ int		get_precision(char *choped)
 {
 	int		i;
 	char	*precision;
+	int		k;
 
 	i = 0;
+	k = 0;
 	precision = (char*)malloc(sizeof(precision) * strlen(choped));
 	while (choped[i])
 	{
 		if (choped[i] == '.')
 		{
+			i++;
 			while (choped[i] >= '0' && choped[i] <= '9')
 				precision[k++] = choped[i++];	
 		}
 		i++;
 	}
+	return (atoi(precision));
 }
 
 int		get_width(char *choped)
@@ -276,28 +281,38 @@ int		get_width(char *choped)
 	char	*width;
 	int		k;
 
-	i = 0;
+	i = ft_strlen(choped) - 1;
+	printf("POSITION WIDTH = %c\n", choped[i]);
 	k = 0;
 	width = (char*)malloc(sizeof(width) * strlen(choped));
-	while (choped[i])
+	while (i >= 0)
 	{
-		if (choped[i] >= '0' && choped[i] <= '9' && choped[i + 1] != '.')
+		i--;
+		if (choped[i] >= '0' && choped[i] <= '9')
 			width[k++] = choped[i];
-		i++;
+		if (!isdigit(choped[i - 1]) && i != 0)
+				break;
+		i--;
 	}
+	ft_strrev(width);
 	return (atoi(width));
 }
 
-int		get_size(char *choped, t_mod data)
+int		get_size(char *choped, t_mod *data)
 {
 	int i;
 	int sum;
 
 	i = 0;
 	sum = 0;
-	if (data->width == 0 || data->precision == 0)
+	if (data->width == 0 && data->precision == 0)
 		return (0);
-	sum = get_width(choped) + get_precision(choped);
+	
+	//printf("width = %d\tprecision = %d\n", get_width(choped), get_precision(choped));
+	if (data->precision == 1)
+		sum = get_precision(choped);
+	else if (data->width == 1)
+		sum = get_width(choped);	
 	return (sum);
 }
 
@@ -326,7 +341,7 @@ char	*convert_numbers(t_mod *data, va_list *arg)
 	result = (char*)malloc(sizeof(result) * 150);
 	if (data->specifier == 'd' || data->specifier == 'i' || data->specifier == 'D')
 		result = strdup(edit_decimal(arg));
-/*	else if (data->specifier == 'o' || data->specifier == 'O')
+	/*else if (data->specifier == 'o' || data->specifier == 'O')
 	   result = strdup(edit_octal(arg));
 	else if (data->specifier == 'u')
 		result  = strdup(edit_unsigned_decimal(arg));
@@ -422,7 +437,7 @@ int main (int argc, char **argv)
 {
 	int n;
 
-	n =	ft_printf("sdc", "caca", 42, 'c');
+	//n =	ft_printf("sdc", "caca", 42, 'c');
 	t_mod flag;
 	int i = 0;
 	char	*choped;
@@ -434,6 +449,7 @@ int main (int argc, char **argv)
 		i++;
 	}
 	printf("%s\n", choped);
+	printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
 	process_flags(choped, &flag);
 
 	printf("dot = %d\n", flag.dot_mod);
