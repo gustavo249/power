@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/09 19:02:08 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/11 16:11:22 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,14 +252,99 @@ t_mod	*process_flags(char *choped, t_mod *data)
 	return (data);
 }
 
+int		get_precision(char *choped)
+{
+	int		i;
+	char	*precision;
 
+	i = 0;
+	precision = (char*)malloc(sizeof(precision) * strlen(choped));
+	while (choped[i])
+	{
+		if (choped[i] == '.')
+		{
+			while (choped[i] >= '0' && choped[i] <= '9')
+				precision[k++] = choped[i++];	
+		}
+		i++;
+	}
+}
+
+int		get_width(char *choped)
+{
+	int		i;
+	char	*width;
+	int		k;
+
+	i = 0;
+	k = 0;
+	width = (char*)malloc(sizeof(width) * strlen(choped));
+	while (choped[i])
+	{
+		if (choped[i] >= '0' && choped[i] <= '9' && choped[i + 1] != '.')
+			width[k++] = choped[i];
+		i++;
+	}
+	return (atoi(width));
+}
+
+int		get_size(char *choped, t_mod data)
+{
+	int i;
+	int sum;
+
+	i = 0;
+	sum = 0;
+	if (data->width == 0 || data->precision == 0)
+		return (0);
+	sum = get_width(choped) + get_precision(choped);
+	return (sum);
+}
+
+char	*convert_strings(t_mod *data, va_list *arg)
+{
+	char	*str;
+	char	c;
+
+	if (data->specifier == 's')
+		str = va_arg(*arg, char*);
+	return (str);
+}
+
+char	*edit_decimal(va_list *arg)
+{
+	int n;
+
+	n = va_arg(*arg, int);
+	return (ft_itoa(n));
+}
+
+char	*convert_numbers(t_mod *data, va_list *arg)
+{
+	char *result;
+
+	result = (char*)malloc(sizeof(result) * 150);
+	if (data->specifier == 'd' || data->specifier == 'i' || data->specifier == 'D')
+		result = strdup(edit_decimal(arg));
+/*	else if (data->specifier == 'o' || data->specifier == 'O')
+	   result = strdup(edit_octal(arg));
+	else if (data->specifier == 'u')
+		result  = strdup(edit_unsigned_decimal(arg));
+	else if (data->specifier == 'x')
+		result = strdup(edit_small_hexa(arg));
+	else if (data->specifier == 'X')
+		result = strdup(edit_big_hexa(arg));
+	else if (data->specifier == 'p')
+		result = strdup(edit_adress(arg));
+	*/return (result);
+
+}
 
 char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
-	char	*text;
+	char		*text;
 
-	if (data->specifier == 'S' || data->specifier == 's' || \
-			data->specifier == 'c' || data->specifier == 'C')
+	if (data->specifier == 's')
 	{
 		text = strdup(convert_strings(data, arg));
 	}
@@ -274,13 +359,17 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg)
 	return (text);
 }
 
-void	if_no_procent(const char *format)
+int		no_procent(const char *format)
 {
 	if (strchr(format, '%') == NULL)
+	{
 		printf("%s", format);
+		return (1);
+	}
+	return (0);
 }
 
-void	how_much_to_print(char	*choped, char *text, t_mod *data)
+void	how_much_to_print(char *choped, char *text, t_mod *data)
 {
 	int length;
 
@@ -296,17 +385,18 @@ int		what_to_print(const char *format, va_list *arg)
 	int		i;
 	
 	i = -1;
-	if_no_procent(format);
+	if (no_procent(format))
+		return (strlen(format) - 1);
 	while (++i < strlen(format))
 	{
-		if (format[i] == '%' && format[i + 1] != '%')
+		if (format[i] == '%' && format[i + 1] != '%' && format[i + 1] != '\0')
 		{
 			choped = strdup(chop_format(format, &i));
 			if (choped != NULL)
 			{
 				data = process_flags(choped, data);
 				text = ft_strdup(convert_based_on_flags(data, arg));
-				i = ft_strlen(choped) + i;
+				i = strlen(choped) + i;
 				how_much_to_print(choped, text, data);
 			}
 		}
@@ -315,6 +405,7 @@ int		what_to_print(const char *format, va_list *arg)
 	}
 	return (g_size);
 }
+
 
 int		ft_printf(const char *format, ...)
 {
@@ -329,7 +420,9 @@ int		ft_printf(const char *format, ...)
 
 int main (int argc, char **argv)
 {
-	//ft_printf("mama%0#m.24d are mere");
+	int n;
+
+	n =	ft_printf("sdc", "caca", 42, 'c');
 	t_mod flag;
 	int i = 0;
 	char	*choped;
