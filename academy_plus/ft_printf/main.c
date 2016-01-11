@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 17:56:46 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/11 19:33:23 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,9 @@ char	*chop_format(const char *format, int *i)
 	return (choped);
 }
 
-void    init_flags(t_mod *flag)
+void	init_flags(t_mod *flag)
 {
+	
 	flag->dot_mod = 0;
 	flag->h_mod = 0;
 	flag->hh_mod = 0;
@@ -76,8 +77,8 @@ void    init_flags(t_mod *flag)
 	flag->zero_mod = 0;
 	flag->plus_mod = 0;
 	flag->space_mod = 0;
-	flag->width = 0;
-	flag->specifier = (char)malloc(1);
+	flag->width = 0;	
+	flag->specifier = 48;
 	flag->precision = 0;
 	flag->procent = 0;
 }
@@ -226,7 +227,7 @@ void	process_specifiers(char *choped, t_mod *data)
 	process_specifiers2(choped, data);
 }
 
-t_mod	*process_flags(char *choped, t_mod *data)
+void	process_flags(char *choped, t_mod *data)
 {
 	int i;
 
@@ -250,7 +251,6 @@ t_mod	*process_flags(char *choped, t_mod *data)
 		process_mods(choped, data);
 	process_precision(choped, data);
 	process_specifiers(choped, data);
-	return (data);
 }
 
 int		get_precision(char *choped)
@@ -272,6 +272,7 @@ int		get_precision(char *choped)
 		}
 		i++;
 	}
+	precision[k] = '\0';
 	return (atoi(precision));
 }
 
@@ -282,18 +283,20 @@ int		get_width(char *choped)
 	int		k;
 
 	i = ft_strlen(choped) - 1;
-	printf("POSITION WIDTH = %c\n", choped[i]);
 	k = 0;
 	width = (char*)malloc(sizeof(width) * strlen(choped));
 	while (i >= 0)
 	{
-		i--;
-		if (choped[i] >= '0' && choped[i] <= '9')
-			width[k++] = choped[i];
-		if (!isdigit(choped[i - 1]) && i != 0)
-				break;
-		i--;
+		if (choped[i] == '0' && !isdigit(choped[i - 1]))
+			i--;
+		else if (!isdigit(choped[i]))
+			i--;
+		else
+			break;
 	}
+	while (isdigit(choped[i]) && i >= 0)
+		width[k++] = choped[i--];
+	width[k] = '\0';
 	ft_strrev(width);
 	return (atoi(width));
 }
@@ -306,13 +309,12 @@ int		get_size(char *choped, t_mod *data)
 	i = 0;
 	sum = 0;
 	if (data->width == 0 && data->precision == 0)
-		return (0);
-	
-	//printf("width = %d\tprecision = %d\n", get_width(choped), get_precision(choped));
-	if (data->precision == 1)
+		return (0);	
+	else if (data->precision == 1)
 		sum = get_precision(choped);
-	else if (data->width == 1)
-		sum = get_width(choped);	
+	else if (data->width == 1 && data->precision == 0)
+		sum = get_width(choped);
+	printf("SUM = %d\n", sum);
 	return (sum);
 }
 
@@ -321,6 +323,7 @@ char	*convert_strings(t_mod *data, va_list *arg)
 	char	*str;
 	char	c;
 
+	str = (char*)malloc(sizeof(str) * 200);
 	if (data->specifier == 's')
 		str = va_arg(*arg, char*);
 	return (str);
@@ -359,6 +362,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
 	char		*text;
 
+
 	if (data->specifier == 's')
 	{
 		text = strdup(convert_strings(data, arg));
@@ -378,7 +382,7 @@ int		no_procent(const char *format)
 {
 	if (strchr(format, '%') == NULL)
 	{
-		printf("%s", format);
+		ft_putstr(format);
 		return (1);
 	}
 	return (0);
@@ -389,14 +393,16 @@ void	how_much_to_print(char *choped, char *text, t_mod *data)
 	int length;
 
 	length = get_size(choped, data);
-	ft_putnstr(text, length);
+	if (length != 0)
+		ft_putnstr(text, length);
+	ft_putstr(text);
 }
 
 int		what_to_print(const char *format, va_list *arg)
 {
 	char	*text;
 	char	*choped;
-	t_mod	*data;
+	t_mod	data;
 	int		i;
 	
 	i = -1;
@@ -409,14 +415,14 @@ int		what_to_print(const char *format, va_list *arg)
 			choped = strdup(chop_format(format, &i));
 			if (choped != NULL)
 			{
-				data = process_flags(choped, data);
-				text = ft_strdup(convert_based_on_flags(data, arg));
+				process_flags(choped, &data);
+				text = ft_strdup(convert_based_on_flags(&data, arg));
 				i = strlen(choped) + i;
-				how_much_to_print(choped, text, data);
+				how_much_to_print(choped, text, &data);
 			}
 		}
 		else
-			printf("%c", format[i]);
+			ft_putchar(format[i]);
 	}
 	return (g_size);
 }
@@ -437,10 +443,9 @@ int main (int argc, char **argv)
 {
 	int n;
 
-	//n =	ft_printf("sdc", "caca", 42, 'c');
-	t_mod flag;
-	int i = 0;
-	char	*choped;
+	n =	ft_printf(argv[1], "piata", 61);
+
+	/*char	*choped;
 
 	while (argv[1][i])
 	{
@@ -468,5 +473,5 @@ int main (int argc, char **argv)
 	printf("width mod = %d\n", flag.width);
 	printf("precision mod = %d\n", flag.precision);
 	printf("procent mod = %d\n", flag.procent);
-	return (0);
+	*/return (0);
 }
