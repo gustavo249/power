@@ -6,13 +6,12 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 21:14:54 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/12 18:31:11 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int		g_size;
 
 // ---------------CREATING THE CHOPED--------
 
@@ -336,6 +335,18 @@ int		get_size(char *choped, t_mod *data)
 
 //----------DEALING WITH MODS------
 
+int		base(t_mod *data)
+{
+	int		base;
+
+	base = 0;
+	if (data->specifier == 'o')
+		base = 8;
+	else if (data->specifier == 'x' || data->specifier == 'X')
+		base = 16;
+	return (base);
+}
+
 void	hh_case(t_mod *data, va_list *arg)
 {
 	signed char decimal;
@@ -344,14 +355,59 @@ void	hh_case(t_mod *data, va_list *arg)
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa((int)decimal));	
+		data->result = ft_strdup(ft_itoa((int)decimal));
 	}
-	else if (data->specifier == 'u' || data->specifier == 'o' || \
-			data->specifier == 'x' || data->specifier == 'X')
+	else if (data->specifier == 'o' || data->specifier == 'x')
 	{		
 		other_base = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa((int)other_base));
+		data->result = ft_strdup(ft_itoa_base((int)other_base, base(data)));
 	}
+	else if (data->specifier == 'u')
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_strdup(ft_utoa(other_base));
+	}
+	else if (data->specifier == 'X')
+	{
+		other_base = va_arg(*arg, int);
+		data->result = ft_strdup(ft_itoa_baseUPP((int)other_base, base(data)));
+	}
+}
+
+void	no_case_strings(t_mod *data, va_list *arg)
+{
+	if (data->specifier == 's')
+		data->result = ft_strdup(va_arg(*arg, char*));
+	else if (data->specifier == 'c')
+		data->chr = va_arg(*arg, int);
+}
+
+void	no_case(t_mod *data, va_list *arg)
+{
+	int				decimal;
+	unsigned int	other_base;
+
+	if (data->specifier == 'd' || data->specifier == 'i')
+	{
+		decimal = va_arg(*arg, int);
+		data->result = ft_strdup(ft_itoa(decimal));
+	}
+	else if (data->specifier == 'o' || data->specifier == 'x')
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_strdup(ft_utoa_base(other_base, base(data)));
+	}
+	else if (data->specifier == 'X')
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_strdup(ft_utoa_baseUPP(other_base, base(data)));
+	}
+	else if (data->specifier == 'u')
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_strdup(ft_utoa(other_base));
+	}
+	no_case_strings(data, arg);
 }
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
@@ -368,72 +424,24 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 		j_case(data, arg);
 	else if (data->z_mod = 1)
 		z_case(data, arg);
-*/}
-/*
-char	*convert_strings(t_mod *data, va_list *arg)
-{
-	char	*str;
-
-	str = (char*)malloc(sizeof(str) * 50000);
-	if (data->specifier == 's')
-		str = va_arg(*arg, char*);
-	return (str);
+	*/else
+		no_case(data, arg);
 }
 
-char	*edit_decimal(va_list *arg)
-{
-	int n;
-
-	n = va_arg(*arg, int);
-	return (ft_itoa(n));
-}
-
-char	*convert_numbers(t_mod *data, va_list *arg)
-{
-	char *result;
-
-	result = (char*)malloc(sizeof(result) * 150);
-	if (data->specifier == 'd' || data->specifier == 'i' || data->specifier == 'D')
-		result = ft_strdup();
-	else if (data->specifier == 'o' || data->specifier == 'O')
-	   result = ft_strdup(edit_octal(arg));
-	else if (data->specifier == 'u')
-		result  = ft_strdup(edit_unsigned_decimal(arg));
-	else if (data->specifier == 'x')
-		result = ft_strdup(edit_small_hexa(arg));
-	else if (data->specifier == 'X')
-		result = ft_strdup(edit_big_hexa(arg));
-	else if (data->specifier == 'p')
-		result = ft_strdup(edit_adress(arg));
-	hh_case(data, arg);
-	return (result);
-
-}
-*/
-
-//----------HERE WE START THE CONVERTING PHASE-------------
+//----------HERE WE START THE CONVERTING PHASE (THE MAGIC BEGINS)-------------
 
 char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
 	char		*text = NULL;
 
 	text = ft_memalloc(50000);
-	/*if (data->specifier == 's')
-	{
-		text = ft_strdup(convert_strings(data, arg));
-	}
-	else if (data->specifier == 'd' || data->specifier == 'D' || \
-			data->specifier == 'i' || data->specifier == 'o' || \
-			data->specifier == 'O' || data->specifier == 'u' || \
-			data->specifier == 'x' || data->specifier == 'X' || \
-			data->specifier == 'p')
-	{
-		text = ft_strdup(convert_numbers(data, arg));
-	}*/
 	edit_based_on_mods(data, arg);
 	text = ft_strdup(data->result);
 	return (text);
 }
+
+
+//--------------------WHAT IF WE JUST HAVE TO PRINT THE FORMAT---------------
 
 int		no_procent(const char *format)
 {
@@ -445,45 +453,61 @@ int		no_procent(const char *format)
 	return (0);
 }
 
-void	how_much_to_print(char *choped, char *text, t_mod *data)
+int		how_much_to_print(char *choped, char *text, t_mod *data)
 {
 	int length;
+	int size;
 
+	size = 0;
 	length = get_size(choped, data);
 	if (length != 0)
 		ft_putnstr(text, length);
+	else if (data->specifier == 'c')
+	{
+		ft_putchar(data->chr);
+		size++;
+	}
 	ft_putstr(text);
+	size = size + ft_strlen(text);
+	return (size);
 }
 
 //----------------THE HEART OF THE PROGRAM-------------
 
+void	start_engine(char *text, char *choped, \
+		t_mod *data, unsigned long int *i, int *size, va_list *arg)
+{
+	process_flags(choped, data);
+	text = ft_strdup(convert_based_on_flags(data, arg));
+	*i = ft_strlen(choped) + *i;
+	*size = *size + how_much_to_print(choped, text, data);
+}
+
 int		what_to_print(const char *format, va_list *arg)
 {
-	char	*text;
+	char	*text = NULL;
+	int		size;
 	char	*choped;
 	t_mod	data;
 	unsigned long int	i;
 	
 	i = -1;
-	if (no_procent(format))
-		return (ft_strlen(format) - 1);
+	size = 0;
 	while (++i < ft_strlen(format))
 	{
 		if (format[i] == '%' && format[i + 1] != '%' && format[i + 1] != '\0')
 		{
 			choped = ft_strdup(chop_format(format, &i));
 			if (choped != NULL)
-			{
-				process_flags(choped, &data);
-				text = ft_strdup(convert_based_on_flags(&data, arg));
-				i = ft_strlen(choped) + i;
-				how_much_to_print(choped, text, &data);
-			}
+				start_engine(text, choped, &data, &i, &size, arg);
 		}
 		else
+		{
 			ft_putchar(format[i]);
+			size++;
+		}
 	}
-	return (g_size);
+	return (size);
 }
 
 
@@ -494,27 +518,23 @@ int		ft_printf(const char *format, ...)
 	va_list arg;
 	int done;
 
+	done = 0;
 	va_start(arg, format);
+	if (no_procent(format))
+		return (ft_strlen(format) - 1);
 	done = what_to_print(format, &arg);
 	va_end(arg);
 	return (done);
 }
-
+/*
 int main (int argc, char **argv)
 {
 	int n;
 
-	n =	ft_printf(argv[1], 156000);
+	n =	ft_printf(argv[1], argv[2]);
 
-/*	char	*choped;
+	char	*choped;
 
-	while (argv[1][i])
-	{
-		if (argv[1][i] == '%')
-			choped = strdup(chop_format(argv[1], &i));
-		i++;
-	}
-	printf("%s\n", choped);
 	printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
 	process_flags(choped, &flag);
 
@@ -534,5 +554,5 @@ int main (int argc, char **argv)
 	printf("width mod = %d\n", flag.width);
 	printf("precision mod = %d\n", flag.precision);
 	printf("procent mod = %d\n", flag.procent);
-*/	return (0);
-}
+	return (0);
+}*/
