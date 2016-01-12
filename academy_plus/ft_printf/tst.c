@@ -6,15 +6,14 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/12 17:25:08 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/12 19:26:18 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include <stdio.h>
 
 int main ()
 {
-	printf("done = %d\n", ft_printf("decimal = %d, hexa = %x, octal = %o chr = %c\n", 14, 14, 14, 'a'));
-	printf("decimal = %d, hexa = %x, octal = %o, chr = %c", 14, 14, 14, 'a');
+	printf("%hhd\n",127 + 42);
 	return (0);
 }

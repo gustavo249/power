@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/12 18:31:11 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/12 19:38:26 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,7 +340,7 @@ int		base(t_mod *data)
 	int		base;
 
 	base = 0;
-	if (data->specifier == 'o')
+	if (data->specifier == 'o' || data->specifier == 'O')
 		base = 8;
 	else if (data->specifier == 'x' || data->specifier == 'X')
 		base = 16;
@@ -352,17 +352,21 @@ void	hh_case(t_mod *data, va_list *arg)
 	signed char decimal;
 	unsigned char other_base;
 
-	if (data->specifier == 'd' || data->specifier == 'i')
+	//int decimal;
+	//unsigned int other_base;
+
+	if (data->specifier == 'd' ||data->specifier == 'D' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
 		data->result = ft_strdup(ft_itoa((int)decimal));
 	}
-	else if (data->specifier == 'o' || data->specifier == 'x')
+	else if (data->specifier == 'o' || data->specifier == 'x' || \
+		   	data->specifier == 'O')
 	{		
 		other_base = va_arg(*arg, int);
 		data->result = ft_strdup(ft_itoa_base((int)other_base, base(data)));
 	}
-	else if (data->specifier == 'u')
+	else if (data->specifier == 'u' || data->specifier == 'U')
 	{
 		other_base = va_arg(*arg, unsigned int);
 		data->result = ft_strdup(ft_utoa(other_base));
@@ -374,25 +378,32 @@ void	hh_case(t_mod *data, va_list *arg)
 	}
 }
 
+//----------------------NO MOD---------------------
+
 void	no_case_strings(t_mod *data, va_list *arg)
 {
-	if (data->specifier == 's')
+	if (data->specifier == 's' || data->specifier == 'S')
 		data->result = ft_strdup(va_arg(*arg, char*));
-	else if (data->specifier == 'c')
+	else if (data->specifier == 'c' || data->specifier == 'C')
 		data->chr = va_arg(*arg, int);
 }
 
-void	no_case(t_mod *data, va_list *arg)
+void	no_case_decimal(t_mod *data, va_list *arg)
 {
-	int				decimal;
-	unsigned int	other_base;
+	int		decimal;
 
-	if (data->specifier == 'd' || data->specifier == 'i')
+	if (data->specifier == 'd' || data->specifier == 'D' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
 		data->result = ft_strdup(ft_itoa(decimal));
 	}
-	else if (data->specifier == 'o' || data->specifier == 'x')
+}
+
+void	no_case(t_mod *data, va_list *arg)
+{
+	unsigned int	other_base;
+
+	if (data->specifier == 'o' || data->specifier == 'x' || data->specifier == 'O')
 	{
 		other_base = va_arg(*arg, unsigned int);
 		data->result = ft_strdup(ft_utoa_base(other_base, base(data)));
@@ -402,13 +413,16 @@ void	no_case(t_mod *data, va_list *arg)
 		other_base = va_arg(*arg, unsigned int);
 		data->result = ft_strdup(ft_utoa_baseUPP(other_base, base(data)));
 	}
-	else if (data->specifier == 'u')
+	else if (data->specifier == 'u' || data->specifier == 'U')
 	{
 		other_base = va_arg(*arg, unsigned int);
 		data->result = ft_strdup(ft_utoa(other_base));
 	}
+	no_case_decimal(data, arg);
 	no_case_strings(data, arg);
 }
+
+//----------------------EDIT CORE -----------------------
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
 {
@@ -526,14 +540,14 @@ int		ft_printf(const char *format, ...)
 	va_end(arg);
 	return (done);
 }
-/*
+
 int main (int argc, char **argv)
 {
 	int n;
 
-	n =	ft_printf(argv[1], argv[2]);
+	n =	ft_printf(argv[1], ft_atoi(argv[2]), ft_atoi(argv[3]));
 
-	char	*choped;
+	/*char	*choped;
 
 	printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
 	process_flags(choped, &flag);
@@ -554,5 +568,5 @@ int main (int argc, char **argv)
 	printf("width mod = %d\n", flag.width);
 	printf("precision mod = %d\n", flag.precision);
 	printf("procent mod = %d\n", flag.procent);
-	return (0);
-}*/
+*/	return (0);
+}
