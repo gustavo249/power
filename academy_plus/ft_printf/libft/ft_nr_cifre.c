@@ -1,19 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   ft_nr_cifre.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/11 21:03:42 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 21:06:13 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/12 13:13:43 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/12 13:14:31 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include "libft.h"
 
-int main (int arg, char **argv)
+int		ft_nr_cifre(int n)
 {
-	unsigned char a = -123;
-	printf("%x\n", a);
+	int i;
+
+	i = 0;
+	while (n)
+	{
+		n = n / 10;
+		i++;
+	}
+	return (i);
 }

@@ -1,21 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   tst.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/06 12:55:02 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/08 20:19:09 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/12 17:25:08 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include "ft_printf.h"
 
-int main (void)
+int main ()
 {
-	int c = 24;
-	char *s = "copac";
-	printf("<<<%m#x>>>>", c);
+	printf("done = %d\n", ft_printf("decimal = %d, hexa = %x, octal = %o chr = %c\n", 14, 14, 14, 'a'));
+	printf("decimal = %d, hexa = %x, octal = %o, chr = %c", 14, 14, 14, 'a');
 	return (0);
 }

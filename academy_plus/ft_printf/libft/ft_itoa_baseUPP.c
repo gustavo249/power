@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   str.c                                              :+:      :+:    :+:   */
+/*   ft_itoa_baseUPP.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/06 11:04:12 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/06 11:11:32 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/12 14:02:00 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/12 15:10:58 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string.h>
-#include <stdio.h>
+#include "libft.h"
 
-int main (void)
+char	*ft_itoa_baseUPP(int n, int base)
 {
-	char *s1 = "mama are mere %-0123.ld";
-	char *s2 = "0123456789 hlzj+-.#0";
-	int i = 0;
-	int k = 0;
-	char result[100];
+	char *str;
+	char *q;
+	int i;
 
-	while (s1[i])
+	i = 0;
+	str = (char*)malloc(sizeof(str) * 100);
+	q = "0123456789ABCDEF";
+	if (n <= 0)
+		return (ft_itoa(n));
+	while (n)
 	{
-		printf("i = %d\n", i);
-		printf("%s\n", result);
-		result[k++] = *strstr(s2, (s1 + i));
+		str[i] = q[n % base];
+		n = n / base;
 		i++;
 	}
-	return (1);
+	str[i] = '\0';
+	ft_strrev(str);
+	return (str);
 }

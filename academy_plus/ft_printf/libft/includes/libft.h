@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 17:14:12 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/12 16:09:32 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,13 @@ int					ft_isascii(int c);
 int					ft_isprint(int c);
 int					ft_toupper(int c);
 int					ft_tolower(int c);
+int					ft_nr_cifre(int n);
 char				*ft_itoa(int n);
+char				*ft_utoa(unsigned int n);
+char				*ft_itoa_base(int n, int base);
+char				*ft_utoa_base(unsigned int n, int base);
+char				*ft_itoa_baseUPP(int n, int base);
+char				*ft_utoa_baseUPP(unsigned int n, int base);
 void				*ft_memset(void *b, int c, size_t len);
 void				ft_bzero(void *s, size_t n);
 void				*ft_memcpy(void *dst, const void *src, size_t n);

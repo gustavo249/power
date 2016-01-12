@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 19:59:08 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/12 17:58:51 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "../libft/libft.h"
+#include "libft.h"
 #include <string.h>
 #include <ctype.h>
 
@@ -44,6 +44,8 @@ typedef struct	s_mod
 	int		hash_size;
 	int		width_size;
 	int		precision_size;
+	char	*result;
+	char	chr;
 
 }				t_mod;
 
@@ -64,12 +66,14 @@ void    process_flags(char *choped, t_mod *data);
 int     get_precision(char *choped);
 int     get_width(char *choped);
 int     get_size(char *choped, t_mod *data);
-char    *convert_strings(t_mod *data, va_list *arg);
-char    *edit_decimal(va_list *arg);
-char    *convert_numbers(t_mod *data, va_list *arg);
+int		base(t_mod *data);
+void	hh_case(t_mod *data, va_list *arg);
+void	no_case_strings(t_mod *data, va_list *arg);
+void	no_case(t_mod *data, va_list *arg);
+void	edit_based_on_mods(t_mod *data, va_list *arg);
 char    *convert_based_on_flags(t_mod *data, va_list *arg);
 int     no_procent(const char *format);
-void    how_much_to_print(char *choped, char *text, t_mod *data);
+int    how_much_to_print(char *choped, char *text, t_mod *data);
 int     what_to_print(const char *format, va_list *arg);
 int     ft_printf(const char *format, ...);
 
