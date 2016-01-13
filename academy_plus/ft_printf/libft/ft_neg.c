@@ -1,31 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strnew.c                                        :+:      :+:    :+:   */
+/*   ft_neg.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/10/31 03:57:14 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 16:51:53 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/13 19:24:57 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/13 19:25:41 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strnew(size_t size)
+int		ft_neg(int n)
 {
-	size_t  i;
-	char    *str;
-
-	str = (char*)malloc(sizeof(char) * (size + 1));
-	if (str)
-	{
-		i = 0;
-		while (i <= size)
-		{
-			str[i] = '\0';
-			i++;
-		}
-	}
-	return (str);
+	if (n < 0)
+		n = n * -1;
+	return (n);
 }

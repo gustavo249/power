@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 10:44:34 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/13 19:26:23 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,4 +90,5 @@ char				*ft_ulstr(char *str);
 char				*ft_space_remove(char *str);
 int					ft_sqrt(int n);
 char				*ft_strrev(char *str);
+int					ft_neg(int n);
 #endif

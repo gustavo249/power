@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 14:14:07 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/13 20:01:58 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ char	*chop_format(const char *format, unsigned long int *i)
 
 void	init_flags(t_mod *flag)
 {
-	
+
 	flag->dot_mod = 0;
 	flag->h_mod = 0;
 	flag->hh_mod = 0;
@@ -340,7 +340,7 @@ char	*ft_utoa_base(unsigned int n, int base, char *q)
 	char *str;
 	int i;
 
-	str = ft_memalloc(42);
+	str = ft_strnew(32);
 	i = 0;
 	if (n == 0)
 		str[0] = '0';
@@ -352,46 +352,47 @@ char	*ft_utoa_base(unsigned int n, int base, char *q)
 	return (ft_strrev(str));
 }
 
-char	*ft_uctoa_base(unsigned char n, int base, char *q)
-{
-	char *str;
-	int i;
-
-	str = ft_memalloc(42);
-	i = 0;
-	if (n == 0)
-		str[0] = '0';
-	while (n)
-	{
-		str[i++] = q[n % base];
-		n /= base;
-	}
-	return (ft_strrev(str));
-}
-
-//-----------------------------SIGNED ITOA BASE----------------
-
-char	*ft_ctoa_base(char n, int base, char *q)
+char	*ft_lutoa_base(unsigned long n, int base, char *q)
 {
 	char	*str;
 	int		i;
-	int		minus;
 
-	str = ft_strnew(15);
 	i = 0;
-	minus = 0;
-	if (n < 0)
-		minus = 1;
+	str = ft_strnew(32);
 	if (n == 0)
-		str[0] = '0';
+		str[0] = '0';	
 	while (n)
 	{
 		str[i++] = q[n % base];
 		n /= base;
 	}
-	if (minus && base == 10)
-		str[i] = '-';
 	return (ft_strrev(str));
+}
+
+//------------------------------SIGNED ITOA BASE-----------------
+
+char	*ft_litoa_base(long n, int base, char *q)
+{
+	char    sgn;
+	char    *str;
+	int     i;
+
+	i = 0;
+	sgn = 0;
+	if (n < 0)
+		sgn = 1;
+	str = ft_strnew(32);
+	if (n == 0)
+		str[0] = '0';
+	while (n != 0)
+	{
+		str[i++] = q[ft_neg(n % base)];
+		n /= base;
+	}
+	if (sgn && base == 10)
+		str[i] = '-';
+	str = ft_strrev(str);
+	return (str);
 }
 
 //--------------FINDING OUT THE BASE AND SPECIFIER TYPE-----------------
@@ -412,9 +413,9 @@ int		base(t_mod *data)
 
 int		is_uox(t_mod *data)
 {
-	if (data->specifier == 'u' || data->specifier == 'U')
+	if (data->specifier == 'u')
 		return (1);
-	else if (data->specifier == 'o' || data->specifier == 'O')
+	else if (data->specifier == 'o')
 		return (1);
 	else if (data->specifier == 'x')
 		return (1);
@@ -425,27 +426,75 @@ int		is_uox(t_mod *data)
 
 void	hh_case(t_mod *data, va_list *arg)
 {
-	char decimal;
-	unsigned char other_base;
-	char	*q;
-	char	*Q;
+	char			decimal;
+	unsigned char	other_base;
+	char			*Q;
 
-	q = "0123456789abcdef";
 	Q = "0123456789ABCDEF";
-	if (data->specifier == 'd' || data->specifier == 'D' || data->specifier == 'i')
+	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
-		data->result = ft_ctoa_base(decimal, base(data), "0123456789");
+		data->result = ft_itoa_base(decimal, base(data));	
 	}
 	else if (is_uox(data))
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_uctoa_base(other_base, base(data), q);
+		data->result = ft_itoa_base(other_base, base(data));
 	}
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_uctoa_base(other_base, base(data), Q);
+		data->result = ft_utoa_base(other_base, base(data), Q);
+	}
+}
+
+void	h_case(t_mod *data, va_list *arg)
+{
+	short 					decimal;
+	unsigned short			other_base;
+	char					*Q;
+
+	Q = "0123456789ABCDEF";
+	if (data->specifier == 'd' || data->specifier == 'i')
+	{
+		decimal = va_arg(*arg, int);
+		data->result = ft_itoa_base(decimal, base(data));
+	}
+	else if (is_uox(data))
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_itoa_base(other_base, base(data));
+	}
+	else if (data->specifier == 'X')
+	{
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_utoa_base(other_base, base(data), Q);
+	}
+}
+
+void	l_case(t_mod *data, va_list *arg)
+{
+	long 					decimal;
+	unsigned long			other_base;
+	char					*Q;
+	char					*q;
+
+	Q = "0123456789ABCDEF";
+	q = "0123456789abcdef";
+	if (data->specifier == 'd' || data->specifier == 'i')
+	{
+		decimal = va_arg(*arg, long);
+		data->result = ft_litoa_base(decimal, base(data), q);
+	}
+	else if (is_uox(data))
+	{
+		other_base = va_arg(*arg, unsigned long);
+		data->result = ft_lutoa_base(other_base, base(data), q);
+	}
+	else if (data->specifier == 'X')
+	{
+		other_base = va_arg(*arg, unsigned long);
+		data->result = ft_lutoa_base(other_base, base(data), Q);
 	}
 }
 
@@ -471,7 +520,7 @@ void	no_case(t_mod *data, va_list *arg)
 	int decimal;
 	unsigned int other_base;
 
-	if (data->specifier == 'd' || data->specifier == 'D' || data->specifier == 'i')
+	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
 		data->result = ft_itoa(decimal);
@@ -489,24 +538,40 @@ void	no_case(t_mod *data, va_list *arg)
 	no_case_for_strings(data, arg);
 }
 
+//----------------------IS <<<<< U >>>> <<< D >>> <<<< O >>>> -------------
+
+void	is_UDO(t_mod *data, va_list *arg)
+{
+	unsigned long	other_base;
+	char			*q;
+
+	q = "0123456789abcdef";
+	if (data->specifier == 'O' || data->specifier == 'U' || data->specifier == 'D')
+	{
+		other_base = va_arg(*arg, unsigned long);
+		data->result = ft_lutoa_base(other_base, base(data), q);
+	}
+}
+
 //----------------------EDIT CORE -----------------------
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
 {
-	/*if (data->hh_mod == 1)
+	if (data->hh_mod == 1)
 		hh_case(data, arg);
-	else if (data->h_mod = 1)
+	else if (data->h_mod == 1)
 		h_case(data, arg);
-	else if (data->l_mod = 1)
+	else if (data->l_mod == 1)
 		l_case(data, arg);
-	else if (data->ll_mod = 1)
-		ll_case(data, arg);
-	else if (data->j_mod = 1)
-		j_case(data, arg);
-	else if (data->z_mod = 1)
-		z_case(data, arg);
-	else*/
+	/*else if (data->ll_mod = 1)
+	  ll_case(data, arg);
+	  else if (data->j_mod = 1)
+	  j_case(data, arg);
+	  else if (data->z_mod = 1)
+	  z_case(data, arg);*/
+	else
 		no_case(data, arg);
+	is_UDO(data, arg);
 }
 
 //----------HERE WE START THE CONVERTING PHASE (THE MAGIC BEGINS)-------------
@@ -572,7 +637,7 @@ int		what_to_print(const char *format, va_list *arg)
 	char	*choped;
 	t_mod	data;
 	unsigned long int	i;
-	
+
 	i = -1;
 	size = 0;
 	while (++i < ft_strlen(format))
@@ -608,36 +673,36 @@ int		ft_printf(const char *format, ...)
 	va_end(arg);
 	return (done);
 }
-
+/*
 int main (int argc, char **argv)
 {
 	int n;
 
-	
+	argc = argc + 1 - 1;	
 	printf(argv[1], ft_atoi(argv[2]));
 	printf("\n");
 	n =	ft_printf(argv[1], ft_atoi(argv[2]));
 
-	/*char	*choped;
+	char	*choped;
 
-	printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
-	process_flags(choped, &flag);
+	  printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
+	  process_flags(choped, &flag);
 
-	printf("dot = %d\n", flag.dot_mod);
-	printf("h mod = %d\n", flag.h_mod);
-	printf("hh mod = %d\n", flag.hh_mod);
-	printf("l mod = %d\n", flag.l_mod);
-	printf("ll mod = %d\n", flag.ll_mod);
-	printf("z mod = %d\n", flag.z_mod);
-	printf("j mod = %d\n", flag.j_mod);
-	printf("# mod = %d\n", flag.hash_mod);
-	printf("minus mod = %d\n", flag.minus_mod);
-	printf("0 mod = %d\n", flag.zero_mod);
-	printf("+ mod = %d\n", flag.plus_mod);
-	printf("space mod = %d\n", flag.space_mod);
-	printf("specifier = %c\n", flag.specifier);
-	printf("width mod = %d\n", flag.width);
-	printf("precision mod = %d\n", flag.precision);
-	printf("procent mod = %d\n", flag.procent);
-	*/return (0);
-}
+	  printf("dot = %d\n", flag.dot_mod);
+	  printf("h mod = %d\n", flag.h_mod);
+	  printf("hh mod = %d\n", flag.hh_mod);
+	  printf("l mod = %d\n", flag.l_mod);
+	  printf("ll mod = %d\n", flag.ll_mod);
+	  printf("z mod = %d\n", flag.z_mod);
+	  printf("j mod = %d\n", flag.j_mod);
+	  printf("# mod = %d\n", flag.hash_mod);
+	  printf("minus mod = %d\n", flag.minus_mod);
+	  printf("0 mod = %d\n", flag.zero_mod);
+	  printf("+ mod = %d\n", flag.plus_mod);
+	  printf("space mod = %d\n", flag.space_mod);
+	  printf("specifier = %c\n", flag.specifier);
+	  printf("width mod = %d\n", flag.width);
+	  printf("precision mod = %d\n", flag.precision);
+	  printf("procent mod = %d\n", flag.procent);
+	  return (0);
+}*/
