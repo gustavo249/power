@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/12 19:38:26 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/13 14:14:07 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -333,7 +333,68 @@ int		get_size(char *choped, t_mod *data)
 	return (sum);
 }
 
-//----------DEALING WITH MODS------
+//----------------------------------UNSIGNED UTOA BASE--------------
+
+char	*ft_utoa_base(unsigned int n, int base, char *q)
+{
+	char *str;
+	int i;
+
+	str = ft_memalloc(42);
+	i = 0;
+	if (n == 0)
+		str[0] = '0';
+	while (n)
+	{
+		str[i++] = q[n % base];
+		n /= base;
+	}
+	return (ft_strrev(str));
+}
+
+char	*ft_uctoa_base(unsigned char n, int base, char *q)
+{
+	char *str;
+	int i;
+
+	str = ft_memalloc(42);
+	i = 0;
+	if (n == 0)
+		str[0] = '0';
+	while (n)
+	{
+		str[i++] = q[n % base];
+		n /= base;
+	}
+	return (ft_strrev(str));
+}
+
+//-----------------------------SIGNED ITOA BASE----------------
+
+char	*ft_ctoa_base(char n, int base, char *q)
+{
+	char	*str;
+	int		i;
+	int		minus;
+
+	str = ft_strnew(15);
+	i = 0;
+	minus = 0;
+	if (n < 0)
+		minus = 1;
+	if (n == 0)
+		str[0] = '0';
+	while (n)
+	{
+		str[i++] = q[n % base];
+		n /= base;
+	}
+	if (minus && base == 10)
+		str[i] = '-';
+	return (ft_strrev(str));
+}
+
+//--------------FINDING OUT THE BASE AND SPECIFIER TYPE-----------------
 
 int		base(t_mod *data)
 {
@@ -344,91 +405,97 @@ int		base(t_mod *data)
 		base = 8;
 	else if (data->specifier == 'x' || data->specifier == 'X')
 		base = 16;
+	else
+		base = 10;
 	return (base);
 }
 
+int		is_uox(t_mod *data)
+{
+	if (data->specifier == 'u' || data->specifier == 'U')
+		return (1);
+	else if (data->specifier == 'o' || data->specifier == 'O')
+		return (1);
+	else if (data->specifier == 'x')
+		return (1);
+	return (0);
+}
+
+//----------DEALING WITH MODS------
+
 void	hh_case(t_mod *data, va_list *arg)
 {
-	signed char decimal;
+	char decimal;
 	unsigned char other_base;
+	char	*q;
+	char	*Q;
 
-	//int decimal;
-	//unsigned int other_base;
-
-	if (data->specifier == 'd' ||data->specifier == 'D' || data->specifier == 'i')
+	q = "0123456789abcdef";
+	Q = "0123456789ABCDEF";
+	if (data->specifier == 'd' || data->specifier == 'D' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa((int)decimal));
+		data->result = ft_ctoa_base(decimal, base(data), "0123456789");
 	}
-	else if (data->specifier == 'o' || data->specifier == 'x' || \
-		   	data->specifier == 'O')
-	{		
-		other_base = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa_base((int)other_base, base(data)));
-	}
-	else if (data->specifier == 'u' || data->specifier == 'U')
+	else if (is_uox(data))
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_strdup(ft_utoa(other_base));
+		data->result = ft_uctoa_base(other_base, base(data), q);
 	}
 	else if (data->specifier == 'X')
 	{
-		other_base = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa_baseUPP((int)other_base, base(data)));
+		other_base = va_arg(*arg, unsigned int);
+		data->result = ft_uctoa_base(other_base, base(data), Q);
 	}
 }
 
-//----------------------NO MOD---------------------
+//-------------------NO MOD-------------------------
 
-void	no_case_strings(t_mod *data, va_list *arg)
+void	no_case_for_strings(t_mod *data, va_list *arg)
 {
+	char *result;
+
+	result = ft_strnew(5000);
 	if (data->specifier == 's' || data->specifier == 'S')
-		data->result = ft_strdup(va_arg(*arg, char*));
+	{
+		result = va_arg(*arg, char*);
+		if (result)
+			data->result = ft_strdup(result);
+	}
 	else if (data->specifier == 'c' || data->specifier == 'C')
 		data->chr = va_arg(*arg, int);
 }
 
-void	no_case_decimal(t_mod *data, va_list *arg)
+void	no_case(t_mod *data, va_list *arg)
 {
-	int		decimal;
+	int decimal;
+	unsigned int other_base;
 
 	if (data->specifier == 'd' || data->specifier == 'D' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
-		data->result = ft_strdup(ft_itoa(decimal));
+		data->result = ft_itoa(decimal);
 	}
-}
-
-void	no_case(t_mod *data, va_list *arg)
-{
-	unsigned int	other_base;
-
-	if (data->specifier == 'o' || data->specifier == 'x' || data->specifier == 'O')
+	else if (is_uox(data))
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_strdup(ft_utoa_base(other_base, base(data)));
+		data->result = ft_utoa_base(other_base, base(data), "0123456789abcdef");
 	}
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_strdup(ft_utoa_baseUPP(other_base, base(data)));
+		data->result = ft_utoa_base(other_base, base(data), "0123456789ABCDEF");
 	}
-	else if (data->specifier == 'u' || data->specifier == 'U')
-	{
-		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_strdup(ft_utoa(other_base));
-	}
-	no_case_decimal(data, arg);
-	no_case_strings(data, arg);
+	no_case_for_strings(data, arg);
 }
 
 //----------------------EDIT CORE -----------------------
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
 {
-	if (data->hh_mod == 1)
+	/*if (data->hh_mod == 1)
 		hh_case(data, arg);
-	/*else if (data->h_mod = 1)
+	else if (data->h_mod = 1)
 		h_case(data, arg);
 	else if (data->l_mod = 1)
 		l_case(data, arg);
@@ -438,7 +505,7 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 		j_case(data, arg);
 	else if (data->z_mod = 1)
 		z_case(data, arg);
-	*/else
+	else*/
 		no_case(data, arg);
 }
 
@@ -448,7 +515,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
 	char		*text = NULL;
 
-	text = ft_memalloc(50000);
+	text = ft_memalloc(10000);
 	edit_based_on_mods(data, arg);
 	text = ft_strdup(data->result);
 	return (text);
@@ -476,12 +543,13 @@ int		how_much_to_print(char *choped, char *text, t_mod *data)
 	length = get_size(choped, data);
 	if (length != 0)
 		ft_putnstr(text, length);
-	else if (data->specifier == 'c')
+	else if (data->specifier == 'c' || data->specifier == 'C')
 	{
 		ft_putchar(data->chr);
 		size++;
 	}
-	ft_putstr(text);
+	else
+		ft_putstr(text);
 	size = size + ft_strlen(text);
 	return (size);
 }
@@ -545,7 +613,10 @@ int main (int argc, char **argv)
 {
 	int n;
 
-	n =	ft_printf(argv[1], ft_atoi(argv[2]), ft_atoi(argv[3]));
+	
+	printf(argv[1], ft_atoi(argv[2]));
+	printf("\n");
+	n =	ft_printf(argv[1], ft_atoi(argv[2]));
 
 	/*char	*choped;
 
@@ -568,5 +639,5 @@ int main (int argc, char **argv)
 	printf("width mod = %d\n", flag.width);
 	printf("precision mod = %d\n", flag.precision);
 	printf("procent mod = %d\n", flag.procent);
-*/	return (0);
+	*/return (0);
 }
