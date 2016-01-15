@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 12:20:23 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 14:45:23 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void	init_flags(t_mod *flag)
 	flag->precision = 0;
 	flag->procent = 0;
 	flag->result = ft_memalloc(1000);
+	flag->wstr = ft_memalloc(400);
 }
 
 void	process_precision(char	*choped, t_mod *data)
@@ -315,24 +316,6 @@ int		get_width(char *choped)
 	return (ft_atoi(width));
 }
 
-//---------ADDING THE WIDTH OR PRECISION TO A SUM---------
-
-int		get_size(char *choped, t_mod *data)
-{
-	int i;
-	int sum;
-
-	i = 0;
-	sum = 0;
-	if (data->width == 0 && data->precision == 0)
-		return (0);	
-	else if (data->precision == 1)
-		sum = get_precision(choped);
-	else if (data->width == 1 && data->precision == 0)
-		sum = get_width(choped);
-	return (sum);
-}
-
 //----------------------------------UNSIGNED UTOA BASE--------------
 
 char	*ft_utoa_base(unsigned int n, int base, char *q)
@@ -368,7 +351,6 @@ char	*ft_lutoa_base(unsigned long n, int base, char *q)
 	}
 	return (ft_strrev(str));
 }
-
 
 //--------------FINDING OUT THE BASE AND SPECIFIER TYPE-----------------
 
@@ -447,6 +429,14 @@ void	h_case(t_mod *data, va_list *arg)
 	}
 }
 
+void	l_case_for_strings(t_mod *data, va_list *arg)
+{
+	if (data->specifier == 'c')
+		data->wchr = va_arg(*arg, wint_t);
+	else if (data->specifier == 's')
+		data->wstr = va_arg(*arg, wchar_t*);
+}
+
 void	l_case(t_mod *data, va_list *arg)
 {
 	long 					decimal;
@@ -471,6 +461,33 @@ void	l_case(t_mod *data, va_list *arg)
 		other_base = va_arg(*arg, unsigned long);
 		data->result = ft_lutoa_base(other_base, base(data), Q);
 	}
+	l_case_for_strings(data, arg);
+}
+
+void	ll_case(t_mod *data, va_list *arg)
+{
+	unsigned long long int	other_base;
+	long long int 			decimal;
+	char					*q;
+	char					*Q;
+
+	Q = "0123456789ABCDEF";
+	q = "0123456789abcdef";
+	if (data->specifier == 'd' || data->specifier == 'i')
+	{
+		decimal = va_arg(*arg, long long);
+		data->result = ft_litoa(decimal);
+	}
+	else if (is_uox(data))
+	{
+		other_base = va_arg(*arg, unsigned long long);
+		data->result = ft_lutoa_base(other_base, base(data), q);
+	}
+	else if (data->specifier == 'X')
+	{
+		other_base = va_arg(*arg, unsigned long long);
+		data->result = ft_lutoa_base(other_base, base(data), Q);
+	}
 }
 
 //-------------------NO MOD-------------------------
@@ -479,14 +496,14 @@ void	no_case_for_strings(t_mod *data, va_list *arg)
 {
 	char *result;
 
-	result = ft_strnew(5000);
-	if (data->specifier == 's' || data->specifier == 'S')
+	result = ft_memalloc(300);
+	if (data->specifier == 's')
 	{
 		result = va_arg(*arg, char*);
 		if (result)
 			data->result = ft_strdup(result);
 	}
-	else if (data->specifier == 'c' || data->specifier == 'C')
+	else if (data->specifier == 'c')
 		data->chr = va_arg(*arg, int);
 }
 
@@ -515,7 +532,7 @@ void	no_case(t_mod *data, va_list *arg)
 
 //----------------------IS <<<<< U >>>> <<< D >>> <<<< O >>>> -------------
 
-void	is_UDO(t_mod *data, va_list *arg)
+void	is_UDOSC(t_mod *data, va_list *arg)
 {
 	unsigned long	other_base;
 	long			decimal;
@@ -532,6 +549,10 @@ void	is_UDO(t_mod *data, va_list *arg)
 		decimal = va_arg(*arg, long);
 		data->result = ft_litoa(decimal);
 	}
+	else if (data->specifier == 'S')
+		data->wstr = va_arg(*arg, wchar_t*);
+	else if (data->specifier == 'C')
+		data->wchr = va_arg(*arg, wint_t);
 }
 
 //----------------------EDIT CORE -----------------------
@@ -544,15 +565,11 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 		h_case(data, arg);
 	else if (data->l_mod == 1)
 		l_case(data, arg);
-	/*else if (data->ll_mod = 1)
+	else if (data->ll_mod == 1 || data->j_mod == 1 || data->z_mod == 1)
 	  ll_case(data, arg);
-	  else if (data->j_mod = 1)
-	  j_case(data, arg);
-	  else if (data->z_mod = 1)
-	  z_case(data, arg);*/
 	else
 		no_case(data, arg);
-	is_UDO(data, arg);
+	is_UDOSC(data, arg);
 }
 
 //----------HERE WE START THE CONVERTING PHASE (THE MAGIC BEGINS)-------------
@@ -561,7 +578,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
 	char		*text = NULL;
 
-	text = ft_memalloc(10000);
+	text = ft_memalloc(1000);
 	edit_based_on_mods(data, arg);
 	text = ft_strdup(data->result);
 	return (text);
@@ -586,17 +603,6 @@ int		how_much_to_print(char *choped, char *text, t_mod *data)
 	int size;
 
 	size = 0;
-	length = get_size(choped, data);
-	if (length != 0)
-		ft_putnstr(text, length);
-	else if (data->specifier == 'c' || data->specifier == 'C')
-	{
-		ft_putchar(data->chr);
-		size++;
-	}
-	else
-		ft_putstr(text);
-	size = size + ft_strlen(text);
 	return (size);
 }
 
@@ -649,23 +655,23 @@ int		ft_printf(const char *format, ...)
 	done = 0;
 	va_start(arg, format);
 	if (no_procent(format))
-		return (ft_strlen(format) - 1);
+		return (ft_strlen(format));
 	done = what_to_print(format, &arg);
 	va_end(arg);
 	return (done);
 }
-/*
+
 int main (int argc, char **argv)
 {
 	int n;
-	long int a = -241;
+	long long int a = -2147483648;
 
 	argc = argc + 1 - 1;	
-	printf(argv[1], a);
+	printf(argv[1], L'暖');
 	printf("\n");
-	n =	ft_printf(argv[1], a);
+	n =	ft_printf(argv[1], L'暖');
 
-	char	*choped;
+	/*char	*choped;
 
 	  printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
 	  process_flags(choped, &flag);
@@ -686,5 +692,5 @@ int main (int argc, char **argv)
 	  printf("width mod = %d\n", flag.width);
 	  printf("precision mod = %d\n", flag.precision);
 	  printf("procent mod = %d\n", flag.procent);
-	  return (0);
-}*/
+*/	  return (0);
+}
