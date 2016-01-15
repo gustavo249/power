@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 14:45:23 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 21:29:48 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ char	*chop_format(const char *format, unsigned long int *i)
 
 void	init_flags(t_mod *flag)
 {
-
-	flag->dot_mod = 0;
 	flag->h_mod = 0;
 	flag->hh_mod = 0;
 	flag->l_mod = 0;
@@ -85,7 +83,10 @@ void	init_flags(t_mod *flag)
 	flag->precision = 0;
 	flag->procent = 0;
 	flag->result = ft_memalloc(1000);
-	flag->wstr = ft_memalloc(400);
+	flag->wstr = ft_memalloc(200);
+	flag->choped = ft_memalloc(20);
+	flag->precizie = ft_memalloc(200);
+	flag->lungime = ft_memalloc(200);
 }
 
 void	process_precision(char	*choped, t_mod *data)
@@ -297,22 +298,19 @@ int		get_width(char *choped)
 	char	*width;
 	int		k;
 
-	i = ft_strlen(choped) - 1;
+	i = 0;
 	k = 0;
-	width = (char*)malloc(sizeof(width) * strlen(choped));
-	while (i >= 0)
+	width = ft_memalloc(ft_strlen(choped));
+	while (choped[i])
 	{
-		if (choped[i] == '0' && !ft_isdigit(choped[i - 1]))
-			i--;
-		else if (!ft_isdigit(choped[i]))
-			i--;
-		else
+		if (ft_isdigit(choped[i]))
+		{
+			while (ft_isdigit(choped[i]))
+				width[k++] = choped[i++];
 			break;
+		}
+		i++;
 	}
-	while (ft_isdigit(choped[i]) && i >= 0)
-		width[k++] = choped[i--];
-	width[k] = '\0';
-	ft_strrev(width);
 	return (ft_atoi(width));
 }
 
@@ -566,13 +564,98 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 	else if (data->l_mod == 1)
 		l_case(data, arg);
 	else if (data->ll_mod == 1 || data->j_mod == 1 || data->z_mod == 1)
-	  ll_case(data, arg);
+		ll_case(data, arg);
 	else
 		no_case(data, arg);
 	is_UDOSC(data, arg);
 }
 
-//----------HERE WE START THE CONVERTING PHASE (THE MAGIC BEGINS)-------------
+
+//-------------------------CHOP THE WIDTH-------------------------
+
+void	stock_width(t_mod *data)
+{
+	char	*width;
+	int		len;
+	int		i;
+
+	i = 0;
+	if (get_precision(data->choped) == 0)
+		len = get_width(data->choped) - (int)ft_strlen(data->result);
+	else
+		len = get_width(data->choped) - get_precision(data->choped);
+	if (len > 0)
+	{
+		width = ft_memalloc(len);
+		while (len > 0)
+		{
+			width[i++] = ' ';
+			len--;
+		}
+		data->lungime = ft_strdup(width);
+	}
+}
+
+//-----------------------------CHOP PRECISION-------------------------
+
+void	stock_precision(t_mod *data)
+{
+	int		len;
+	char	*tmp;
+	int		i;
+
+	i = 0;
+	len = get_precision(data->choped) - ft_strlen(data->result);
+	if (len > 0)
+	{
+		tmp = ft_memalloc(len);
+		while (len > 0)
+		{
+			tmp[i++] = '0';
+			len--;
+		}
+		data->precizie = ft_strdup(tmp);
+	}
+}
+
+//--------------------------COMPUTING WIDTH + PRECISION------------------
+
+void	compute_size(t_mod *data)
+{
+	char	*final;
+
+	final = ft_memalloc(1000);
+	if (data->minus_mod == 1)
+	{
+		final = ft_strjoin(final, data->precizie);
+		final = ft_strjoin(final, data->result);
+		final = ft_strjoin(final, data->lungime);
+	}
+	else
+	{
+		final = ft_strjoin(final, data->lungime);
+		final = ft_strjoin(final, data->precizie);
+		final = ft_strjoin(final, data->result);
+	}
+	data->result = ft_strdup(final);
+}
+
+//----------------------EDIT FLAGS------------------------------------
+
+void	edit_based_on_flags(t_mod *data)
+{
+	if (data->specifier != 's' && data->specifier != 'S' && data->specifier != 'c'\
+			&& data->specifier != 'C')
+	{
+		if (data->width == 1)
+			stock_width(data);
+		if (data->precision == 1)
+			stock_precision(data);
+		compute_size(data);
+	}
+}
+
+//---------------------------CONVERTING CORE--------------------
 
 char	*convert_based_on_flags(t_mod *data, va_list *arg)
 {
@@ -580,6 +663,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg)
 
 	text = ft_memalloc(1000);
 	edit_based_on_mods(data, arg);
+	edit_based_on_flags(data);
 	text = ft_strdup(data->result);
 	return (text);
 }
@@ -597,12 +681,18 @@ int		no_procent(const char *format)
 	return (0);
 }
 
-int		how_much_to_print(char *choped, char *text, t_mod *data)
+int		how_much_to_print(char *text, t_mod *data)
 {
-	int length;
 	int size;
 
 	size = 0;
+	size = size + ft_strlen(data->result);
+	if (data->specifier == 'c')
+	{
+		ft_putchar(data->chr);
+		size++;
+	}
+	ft_putstr(text);
 	return (size);
 }
 
@@ -612,9 +702,10 @@ void	start_engine(char *text, char *choped, \
 		t_mod *data, unsigned long int *i, int *size, va_list *arg)
 {
 	process_flags(choped, data);
+	data->choped = ft_strdup(choped);
 	text = ft_strdup(convert_based_on_flags(data, arg));
 	*i = ft_strlen(choped) + *i;
-	*size = *size + how_much_to_print(choped, text, data);
+	*size = *size + how_much_to_print(text, data);
 }
 
 int		what_to_print(const char *format, va_list *arg)
@@ -660,37 +751,36 @@ int		ft_printf(const char *format, ...)
 	va_end(arg);
 	return (done);
 }
-
+/*
 int main (int argc, char **argv)
 {
 	int n;
-	long long int a = -2147483648;
 
 	argc = argc + 1 - 1;	
-	printf(argv[1], L'暖');
+	printf(argv[1], argv[2]);
 	printf("\n");
-	n =	ft_printf(argv[1], L'暖');
+	n =	ft_printf(argv[1], argv[2]);
 
-	/*char	*choped;
+		char	*choped;
 
-	  printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
-	  process_flags(choped, &flag);
+		printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
+		process_flags(choped, &flag);
 
-	  printf("dot = %d\n", flag.dot_mod);
-	  printf("h mod = %d\n", flag.h_mod);
-	  printf("hh mod = %d\n", flag.hh_mod);
-	  printf("l mod = %d\n", flag.l_mod);
-	  printf("ll mod = %d\n", flag.ll_mod);
-	  printf("z mod = %d\n", flag.z_mod);
-	  printf("j mod = %d\n", flag.j_mod);
-	  printf("# mod = %d\n", flag.hash_mod);
-	  printf("minus mod = %d\n", flag.minus_mod);
-	  printf("0 mod = %d\n", flag.zero_mod);
-	  printf("+ mod = %d\n", flag.plus_mod);
-	  printf("space mod = %d\n", flag.space_mod);
-	  printf("specifier = %c\n", flag.specifier);
-	  printf("width mod = %d\n", flag.width);
-	  printf("precision mod = %d\n", flag.precision);
-	  printf("procent mod = %d\n", flag.procent);
-*/	  return (0);
-}
+		printf("dot = %d\n", flag.dot_mod);
+		printf("h mod = %d\n", flag.h_mod);
+		printf("hh mod = %d\n", flag.hh_mod);
+		printf("l mod = %d\n", flag.l_mod);
+		printf("ll mod = %d\n", flag.ll_mod);
+		printf("z mod = %d\n", flag.z_mod);
+		printf("j mod = %d\n", flag.j_mod);
+		printf("# mod = %d\n", flag.hash_mod);
+		printf("minus mod = %d\n", flag.minus_mod);
+		printf("0 mod = %d\n", flag.zero_mod);
+		printf("+ mod = %d\n", flag.plus_mod);
+		printf("space mod = %d\n", flag.space_mod);
+		printf("specifier = %c\n", flag.specifier);
+		printf("width mod = %d\n", flag.width);
+		printf("precision mod = %d\n", flag.precision);
+		printf("procent mod = %d\n", flag.procent);
+		return (0);
+}*/

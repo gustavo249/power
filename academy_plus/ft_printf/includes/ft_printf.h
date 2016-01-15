@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 13:53:02 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 21:22:02 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 
 typedef struct	s_mod
 {
-	int		dot_mod;
 	int		h_mod;
 	int		hh_mod;
 	int		l_mod;
@@ -46,12 +45,16 @@ typedef struct	s_mod
 	int		width_size;
 	int		precision_size;
 	char	*result;
+	char	*choped;
 	char	chr;
+	char	*precizie;
+	char	*lungime;
 	wint_t	wchr;
 	wchar_t *wstr;
 }				t_mod;
 
 
+/*
 int     is_flag(const char *format, int *k);
 int     is_specifier(const char *format, int *k);
 char    *chop_format(const char *format, unsigned long int *i);
@@ -78,5 +81,5 @@ int     no_procent(const char *format);
 int    how_much_to_print(char *choped, char *text, t_mod *data);
 int     what_to_print(const char *format, va_list *arg);
 int     ft_printf(const char *format, ...);
-
+*/
 #endif
