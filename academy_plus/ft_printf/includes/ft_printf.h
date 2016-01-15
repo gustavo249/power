@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 11:18:54 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 13:53:02 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ typedef struct	s_mod
 	int		precision_size;
 	char	*result;
 	char	chr;
-
+	wint_t	wchr;
+	wchar_t *wstr;
 }				t_mod;
 
 

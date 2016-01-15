@@ -6,18 +6,16 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 12:08:03 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 14:27:20 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 int main (int argc, char **argv)
 {
-
-	long n = -234;
-	argc = argc + 1 - 1;
-	printf("%D", n);
+	printf(argv[1], atoi(argv[2]));
 	return (0);
 }
