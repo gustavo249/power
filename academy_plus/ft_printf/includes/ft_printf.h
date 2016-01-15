@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/12 17:58:51 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 11:18:54 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "libft.h"
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
 #define FLAGS "0123456789 -+#0.hljz"
 

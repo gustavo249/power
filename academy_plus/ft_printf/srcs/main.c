@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 20:01:58 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 12:20:23 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -369,31 +369,6 @@ char	*ft_lutoa_base(unsigned long n, int base, char *q)
 	return (ft_strrev(str));
 }
 
-//------------------------------SIGNED ITOA BASE-----------------
-
-char	*ft_litoa_base(long n, int base, char *q)
-{
-	char    sgn;
-	char    *str;
-	int     i;
-
-	i = 0;
-	sgn = 0;
-	if (n < 0)
-		sgn = 1;
-	str = ft_strnew(32);
-	if (n == 0)
-		str[0] = '0';
-	while (n != 0)
-	{
-		str[i++] = q[ft_neg(n % base)];
-		n /= base;
-	}
-	if (sgn && base == 10)
-		str[i] = '-';
-	str = ft_strrev(str);
-	return (str);
-}
 
 //--------------FINDING OUT THE BASE AND SPECIFIER TYPE-----------------
 
@@ -484,7 +459,7 @@ void	l_case(t_mod *data, va_list *arg)
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, long);
-		data->result = ft_litoa_base(decimal, base(data), q);
+		data->result = ft_litoa(decimal);
 	}
 	else if (is_uox(data))
 	{
@@ -543,13 +518,19 @@ void	no_case(t_mod *data, va_list *arg)
 void	is_UDO(t_mod *data, va_list *arg)
 {
 	unsigned long	other_base;
+	long			decimal;
 	char			*q;
 
 	q = "0123456789abcdef";
-	if (data->specifier == 'O' || data->specifier == 'U' || data->specifier == 'D')
+	if (data->specifier == 'O' || data->specifier == 'U')
 	{
 		other_base = va_arg(*arg, unsigned long);
 		data->result = ft_lutoa_base(other_base, base(data), q);
+	}
+	else if (data->specifier == 'D')
+	{
+		decimal = va_arg(*arg, long);
+		data->result = ft_litoa(decimal);
 	}
 }
 
@@ -677,11 +658,12 @@ int		ft_printf(const char *format, ...)
 int main (int argc, char **argv)
 {
 	int n;
+	long int a = -241;
 
 	argc = argc + 1 - 1;	
-	printf(argv[1], ft_atoi(argv[2]));
+	printf(argv[1], a);
 	printf("\n");
-	n =	ft_printf(argv[1], ft_atoi(argv[2]));
+	n =	ft_printf(argv[1], a);
 
 	char	*choped;
 

@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 17:36:33 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 12:08:03 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 
 int main (int argc, char **argv)
 {
+
+	long n = -234;
 	argc = argc + 1 - 1;
-	printf(argv[1], atoi(argv[2]));
+	printf("%D", n);
 	return (0);
 }

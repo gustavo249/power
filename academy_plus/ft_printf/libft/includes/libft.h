@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/13 19:26:23 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/15 12:14:19 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int					ft_toupper(int c);
 int					ft_tolower(int c);
 int					ft_nr_cifre(int n);
 char				*ft_itoa(int n);
+char				*ft_litoa(long int n);
 char				*ft_itoa_base(int n, int base);
 void				*ft_memset(void *b, int c, size_t len);
 void				ft_bzero(void *s, size_t n);
