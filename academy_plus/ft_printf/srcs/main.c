@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 21:29:48 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/16 18:12:14 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ char	*chop_format(const char *format, unsigned long int *i)
 
 void	init_flags(t_mod *flag)
 {
+	flag->dot_mod = 0;
 	flag->h_mod = 0;
 	flag->hh_mod = 0;
 	flag->l_mod = 0;
@@ -239,6 +240,20 @@ void	process_specifiers(char *choped, t_mod *data)
 	process_specifiers2(choped, data);
 }
 
+void	process_zero_mod(char *choped, t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (choped[i])
+	{
+		if (choped[i] == '0' && !ft_isdigit(choped[i - 1]) && \
+					data->minus_mod == 0 && data->precision == 0)
+			data->zero_mod = 1;
+		i++;
+	}
+}
+
 //---------HERE IS THE PROCESSING CORE----------
 
 void	process_flags(char *choped, t_mod *data)
@@ -251,20 +266,21 @@ void	process_flags(char *choped, t_mod *data)
 	{
 		if (choped[i] == '#')
 			data->hash_mod = 1;
-		else if (choped[i] == '0')
-			data->zero_mod = 1;
 		else if (choped[i] == '-')
 			data->minus_mod = 1;
 		else if (choped[i] == '+')
 			data->plus_mod = 1;
 		else if (choped[i] == ' ')
 			data->space_mod = 1;
+		else if (choped[i] == '.' && !ft_isdigit(choped[i + 1]))
+			data->dot_mod = 1;
 		i++;
 	}
 	if (validate_mod(choped) > 0)
 		process_mods(choped, data);
 	process_precision(choped, data);
 	process_specifiers(choped, data);
+	process_zero_mod(choped, data);
 }
 
 //-----------DEALING WITH THE SIZE (WIDTH AND PRECISION)--------------
@@ -575,24 +591,30 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 
 void	stock_width(t_mod *data)
 {
-	char	*width;
 	int		len;
 	int		i;
+	int		k;
+	int		p_size;
 
 	i = 0;
-	if (get_precision(data->choped) == 0)
-		len = get_width(data->choped) - (int)ft_strlen(data->result);
+	len = 0;
+	k = ft_strlen(data->result);
+	p_size = get_precision(data->choped);
+	if (p_size >= k && p_size > 0)
+	{
+		len = get_width(data->choped) - p_size;
+		if (ft_strchr(data->result, '-'))
+			len--;
+	}
 	else
-		len = get_width(data->choped) - get_precision(data->choped);
+		len = get_width(data->choped) - k;
 	if (len > 0)
 	{
-		width = ft_memalloc(len);
 		while (len > 0)
 		{
-			width[i++] = ' ';
+			data->lungime[i++] = ' ';
 			len--;
 		}
-		data->lungime = ft_strdup(width);
 	}
 }
 
@@ -605,7 +627,11 @@ void	stock_precision(t_mod *data)
 	int		i;
 
 	i = 0;
-	len = get_precision(data->choped) - ft_strlen(data->result);
+	len = 0;
+	if (ft_strchr(data->result, '-'))
+		len = get_precision(data->choped) - ft_strlen(data->result) + 1;
+	else
+		len = get_precision(data->choped) - ft_strlen(data->result);
 	if (len > 0)
 	{
 		tmp = ft_memalloc(len);
@@ -614,45 +640,112 @@ void	stock_precision(t_mod *data)
 			tmp[i++] = '0';
 			len--;
 		}
+		tmp[i] = '\0';
 		data->precizie = ft_strdup(tmp);
+		free(tmp);
 	}
 }
 
-//--------------------------COMPUTING WIDTH + PRECISION------------------
+//--------------------------COMPUTING PRECISION FOR NUMBERS---------------
 
-void	compute_size(t_mod *data)
+void	make_positive(t_mod *data)
 {
-	char	*final;
+	int		i;
+	char	*positive;
 
-	final = ft_memalloc(1000);
+	i = 0;
+	positive = ft_memalloc(ft_strlen(data->result));
+	while (data->result[i])
+	{
+		if (data->result[i] == '-')
+			break;
+		i++;
+	}
+	positive = ft_strcpy(positive, data->result + i + 1);
+	free(data->result);
+	data->result = ft_strdup(positive);
+}
+
+void	compute_precision(t_mod *data)
+{
+	if (ft_strchr(data->result , '-'))
+	{
+		make_positive(data);
+		data->precizie = ft_strjoin("-", data->precizie);
+	}
+	data->result = ft_strjoin(data->precizie, data->result);
+}
+
+//------CONCATENATE THE NECESARY WIDTH ( the result already has precision)------
+
+void	compute_width(t_mod *data)
+{
 	if (data->minus_mod == 1)
-	{
-		final = ft_strjoin(final, data->precizie);
-		final = ft_strjoin(final, data->result);
-		final = ft_strjoin(final, data->lungime);
-	}
+		data->result = ft_strjoin(data->result, data->lungime);
 	else
+		data->result = ft_strjoin(data->lungime, data->result);
+}
+
+//------------------------TAKING FLAGS ONE BY ONE----------------
+
+void	case_plus(t_mod *data)
+{
+	if (data->specifier == 'd' || data->specifier == 'i' || \
+			data->specifier == 'D')
 	{
-		final = ft_strjoin(final, data->lungime);
-		final = ft_strjoin(final, data->precizie);
-		final = ft_strjoin(final, data->result);
+		if (ft_strchr(data->result, '-') == NULL)
+			data->result = ft_strjoin("+", data->result);
 	}
-	data->result = ft_strdup(final);
+}
+
+void	case_hash(t_mod *data)
+{
+	int len;
+	int	p_size;
+
+	len = (int)ft_strlen(data->result);
+	p_size = (int)ft_strlen(data->precizie);
+	if (data->specifier == 'x' || data->specifier == 'X')
+		data->result = ft_strjoin("0x", data->result);
+	else if (data->specifier == 'o' || data->specifier =='O')
+	{
+		if (get_precision(data->choped) <= (len - p_size))
+			data->result = ft_strjoin("0", data->result);
+	}
+}
+
+//------------------------IF WE HAVE STRINGS-----------
+
+int		no_strings(t_mod *data)
+{
+	if (data->specifier == 'S' || data->specifier == 's' || data->specifier == 'c'\
+			|| data->specifier == 'C')
+		return (1);
+	return (0);
 }
 
 //----------------------EDIT FLAGS------------------------------------
 
 void	edit_based_on_flags(t_mod *data)
 {
-	if (data->specifier != 's' && data->specifier != 'S' && data->specifier != 'c'\
-			&& data->specifier != 'C')
+	if (!no_strings(data))
 	{
-		if (data->width == 1)
-			stock_width(data);
 		if (data->precision == 1)
 			stock_precision(data);
-		compute_size(data);
+		compute_precision(data);
+		if (data->hash_mod == 1)
+			case_hash(data);
+		if (data->plus_mod == 1)
+			case_plus(data);
+		/*if (data->space_mod == 1)
+			case_space(data);
+		if (data->zero_mod == 1)
+			case_zero(data);*/
+		if (data->width == 1)
+			stock_width(data);
+		compute_width(data);
 	}
+	//edit_strings_flags(data);
 }
 
 //---------------------------CONVERTING CORE--------------------
@@ -757,9 +850,10 @@ int main (int argc, char **argv)
 	int n;
 
 	argc = argc + 1 - 1;	
-	printf(argv[1], argv[2]);
+	printf(argv[1], ft_atoi(argv[2]));
+	printf("<<<<");
 	printf("\n");
-	n =	ft_printf(argv[1], argv[2]);
+	n =	ft_printf(argv[1], ft_atoi(argv[2]));
 
 		char	*choped;
 

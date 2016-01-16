@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 21:22:02 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/16 16:34:36 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 
 typedef struct	s_mod
 {
+	int		dot_mod;
 	int		h_mod;
 	int		hh_mod;
 	int		l_mod;
