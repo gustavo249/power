@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/18 16:29:29 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/18 20:36:12 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	init_flags(t_mod *flag)
 	flag->zero_mod = 0;
 	flag->plus_mod = 0;
 	flag->space_mod = 0;
-	flag->width = 0;	
+	flag->width = 0;
 	flag->specifier = 48;
 	flag->precision = 0;
 	flag->procent = 0;
@@ -509,15 +509,8 @@ void	ll_case(t_mod *data, va_list *arg)
 
 void	no_case_for_strings(t_mod *data, va_list *arg)
 {
-	char	*result;
-
-	result = ft_memalloc(300);
 	if (data->specifier == 's')
-	{
-		result = va_arg(*arg, char*);
-		if (result != NULL)
-			data->result = ft_strdup(result);
-	}
+		data->result = va_arg(*arg, char*);
 	else if (data->specifier == 'c')
 		data->result[0] = va_arg(*arg, int);
 }
@@ -587,7 +580,6 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 	is_UDOSC(data, arg);
 }
 
-
 //-------------------------CHOP THE WIDTH-------------------------
 
 void	stock_width(t_mod *data)
@@ -600,6 +592,8 @@ void	stock_width(t_mod *data)
 	i = 0;
 	len = 0;
 	k = ft_strlen(data->result);
+	if (data->result[0] == '\0' || data->plus_mod == 1)
+		k++;
 	p_size = get_precision(data->choped);
 	if (p_size >= k && p_size > 0)
 		len = get_width(data->choped) - p_size;
@@ -702,23 +696,23 @@ void	case_hash(t_mod *data)
 
 	len = (int)ft_strlen(data->result);
 	p_size = (int)ft_strlen(data->precizie);
-	if ((data->specifier == 'x' || data->specifier == 'X') && \
-			data->result[0] != '0')
+	if (data->specifier == 'x' && data->result[0] != '0')
 		data->result = ft_strjoin("0x", data->result);
+	else if (data->specifier == 'X' && data->result[0] != '0')
+		data->result = ft_strjoin("0X", data->result);
 	else if ((data->specifier == 'o' || data->specifier =='O') && \
 			data->result[0] != '0')
 	{
-	//	if (get_precision(data->choped) <= (len - p_size))
 			data->result = ft_strjoin("0", data->result);
 	}
 }
 
 void	case_space(t_mod *data)
 {
-	if (ft_strchr(data->result, '-') == NULL && (data->specifier == 'D' || \
-				data->specifier == 'd' || data->specifier == 'i') && \
-			data->width == 0)
+	if (ft_isdigit(data->result[0]) && (data->specifier == 'D' || \
+				data->specifier == 'd' || data->specifier == 'i'))
 		data->result = ft_strjoin(" ", data->result);
+	
 }
 
 void	case_zero(t_mod *data)
@@ -770,28 +764,33 @@ void	edit_based_on_flags(t_mod *data)
 	}
 		if (data->hash_mod == 1)
 			case_hash(data);
-		if (data->plus_mod == 1)
-			case_plus(data);
 		if (data->width == 1)
 			stock_width(data);
 		if (data->zero_mod == 1 && data->dot_mod == 0)
 			case_zero(data);
-		if (data->space_mod == 1 && data->zero_mod == 0 && data->plus_mod == 0)
-			case_space(data);
+		if (data->plus_mod == 1)
+			case_plus(data);
 		if (data->dot_mod == 1)
 			case_dot(data);	
+		if (data->space_mod == 1)
+			case_space(data);
 		compute_width(data);
+
 	//edit_strings_flags(data);
 }
 
 //---------------------------CONVERTING CORE--------------------
 
-char	*convert_based_on_flags(t_mod *data, va_list *arg)
+char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 {
 	char		*text = NULL;
 
 	text = ft_memalloc(1000);
 	edit_based_on_mods(data, arg);
+	if (data->result == NULL)
+		return (NULL);
+	if (data->result[0] == '\0' && data->specifier != 's')
+		*size = *size + 1;
 	edit_based_on_flags(data);
 	text = ft_strdup(data->result);
 	return (text);
@@ -815,6 +814,12 @@ int		how_much_to_print(char *text, t_mod *data)
 	int size;
 	int len;
 
+	
+	if (text == NULL)
+	{
+		ft_putstr("(null)");
+		return (6);
+	}
 	len = ft_strlen(data->result);
 	size = 0;
 	size = size + len;
@@ -829,7 +834,7 @@ void	start_engine(char *text, char *choped, \
 {
 	process_flags(choped, data);
 	data->choped = ft_strdup(choped);
-	text = ft_strdup(convert_based_on_flags(data, arg));
+	text = ft_strdup(convert_based_on_flags(data, arg, size));
 	*i = ft_strlen(choped) + *i;
 	*size = *size + how_much_to_print(text, data);
 }
@@ -881,14 +886,16 @@ int		ft_printf(const char *format, ...)
 int main (int argc, char **argv)
 {
 	int n;
+	int a;
 
 	argc = argc + 1 - 1;	
-	printf(argv[1], ft_atoi(argv[2]));
+	a = printf(argv[1], 0);
 	printf("<<<<");
 	printf("\n");
-	n =	ft_printf(argv[1], ft_atoi(argv[2]));
+	n =	ft_printf(argv[1], 0);
+	printf("\tOriginal size = %d\tMy size = %d\n", a, n);
 
-		char	*choped;
+	char	*choped;
 
 		printf("WIDTH = %d\t PRECISION = %d\n", get_width(choped), get_precision(choped));
 		process_flags(choped, &flag);
@@ -909,5 +916,5 @@ int main (int argc, char **argv)
 		printf("width mod = %d\n", flag.width);
 		printf("precision mod = %d\n", flag.precision);
 		printf("procent mod = %d\n", flag.procent);
- 	 	return (0);
+ 	return (0);
 }*/
