@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/16 18:12:14 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/18 16:29:29 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,7 +272,8 @@ void	process_flags(char *choped, t_mod *data)
 			data->plus_mod = 1;
 		else if (choped[i] == ' ')
 			data->space_mod = 1;
-		else if (choped[i] == '.' && !ft_isdigit(choped[i + 1]))
+		else if (choped[i] == '.' && (!ft_isdigit(choped[i + 1]) || \
+					choped[i + 1] == '0'))
 			data->dot_mod = 1;
 		i++;
 	}
@@ -319,7 +320,7 @@ int		get_width(char *choped)
 	width = ft_memalloc(ft_strlen(choped));
 	while (choped[i])
 	{
-		if (ft_isdigit(choped[i]))
+		if (choped[i] > '0' && choped[i] <= '9')
 		{
 			while (ft_isdigit(choped[i]))
 				width[k++] = choped[i++];
@@ -446,7 +447,7 @@ void	h_case(t_mod *data, va_list *arg)
 void	l_case_for_strings(t_mod *data, va_list *arg)
 {
 	if (data->specifier == 'c')
-		data->wchr = va_arg(*arg, wint_t);
+		data->wstr[0] = va_arg(*arg, wint_t);
 	else if (data->specifier == 's')
 		data->wstr = va_arg(*arg, wchar_t*);
 }
@@ -508,17 +509,17 @@ void	ll_case(t_mod *data, va_list *arg)
 
 void	no_case_for_strings(t_mod *data, va_list *arg)
 {
-	char *result;
+	char	*result;
 
 	result = ft_memalloc(300);
 	if (data->specifier == 's')
 	{
 		result = va_arg(*arg, char*);
-		if (result)
+		if (result != NULL)
 			data->result = ft_strdup(result);
 	}
 	else if (data->specifier == 'c')
-		data->chr = va_arg(*arg, int);
+		data->result[0] = va_arg(*arg, int);
 }
 
 void	no_case(t_mod *data, va_list *arg)
@@ -566,7 +567,7 @@ void	is_UDOSC(t_mod *data, va_list *arg)
 	else if (data->specifier == 'S')
 		data->wstr = va_arg(*arg, wchar_t*);
 	else if (data->specifier == 'C')
-		data->wchr = va_arg(*arg, wint_t);
+		data->wstr[0] = va_arg(*arg, wint_t);
 }
 
 //----------------------EDIT CORE -----------------------
@@ -601,11 +602,7 @@ void	stock_width(t_mod *data)
 	k = ft_strlen(data->result);
 	p_size = get_precision(data->choped);
 	if (p_size >= k && p_size > 0)
-	{
 		len = get_width(data->choped) - p_size;
-		if (ft_strchr(data->result, '-'))
-			len--;
-	}
 	else
 		len = get_width(data->choped) - k;
 	if (len > 0)
@@ -705,21 +702,58 @@ void	case_hash(t_mod *data)
 
 	len = (int)ft_strlen(data->result);
 	p_size = (int)ft_strlen(data->precizie);
-	if (data->specifier == 'x' || data->specifier == 'X')
+	if ((data->specifier == 'x' || data->specifier == 'X') && \
+			data->result[0] != '0')
 		data->result = ft_strjoin("0x", data->result);
-	else if (data->specifier == 'o' || data->specifier =='O')
+	else if ((data->specifier == 'o' || data->specifier =='O') && \
+			data->result[0] != '0')
 	{
-		if (get_precision(data->choped) <= (len - p_size))
+	//	if (get_precision(data->choped) <= (len - p_size))
 			data->result = ft_strjoin("0", data->result);
 	}
+}
+
+void	case_space(t_mod *data)
+{
+	if (ft_strchr(data->result, '-') == NULL && (data->specifier == 'D' || \
+				data->specifier == 'd' || data->specifier == 'i') && \
+			data->width == 0)
+		data->result = ft_strjoin(" ", data->result);
+}
+
+void	case_zero(t_mod *data)
+{
+	int i;
+	int len;
+
+	i = 0;
+
+	len = ft_strlen(data->lungime);
+	while (i < len)
+	{
+		data->lungime[i] = '0';
+		i++;
+	}
+	if (ft_strchr(data->result, '-'))
+	{
+		make_positive(data);
+		data->lungime = ft_strjoin("-", data->lungime);
+	}
+}
+
+void	case_dot(t_mod *data)
+{
+	if (data->result[0] == '0' && !(data->hash_mod == 1 && \
+				(data->specifier == 'o' || data->specifier == 'O')))
+		data->result = ft_strdup("");
 }
 
 //------------------------IF WE HAVE STRINGS-----------
 
 int		no_strings(t_mod *data)
 {
-	if (data->specifier == 'S' || data->specifier == 's' || data->specifier == 'c'\
-			|| data->specifier == 'C')
+	if (data->specifier == 'S' || data->specifier == 's' || \
+			data->specifier == 'c' || data->specifier == 'C')
 		return (1);
 	return (0);
 }
@@ -733,18 +767,20 @@ void	edit_based_on_flags(t_mod *data)
 		if (data->precision == 1)
 			stock_precision(data);
 		compute_precision(data);
+	}
 		if (data->hash_mod == 1)
 			case_hash(data);
 		if (data->plus_mod == 1)
 			case_plus(data);
-		/*if (data->space_mod == 1)
-			case_space(data);
-		if (data->zero_mod == 1)
-			case_zero(data);*/
 		if (data->width == 1)
 			stock_width(data);
+		if (data->zero_mod == 1 && data->dot_mod == 0)
+			case_zero(data);
+		if (data->space_mod == 1 && data->zero_mod == 0 && data->plus_mod == 0)
+			case_space(data);
+		if (data->dot_mod == 1)
+			case_dot(data);	
 		compute_width(data);
-	}
 	//edit_strings_flags(data);
 }
 
@@ -777,14 +813,11 @@ int		no_procent(const char *format)
 int		how_much_to_print(char *text, t_mod *data)
 {
 	int size;
+	int len;
 
+	len = ft_strlen(data->result);
 	size = 0;
-	size = size + ft_strlen(data->result);
-	if (data->specifier == 'c')
-	{
-		ft_putchar(data->chr);
-		size++;
-	}
+	size = size + len;
 	ft_putstr(text);
 	return (size);
 }
@@ -803,17 +836,17 @@ void	start_engine(char *text, char *choped, \
 
 int		what_to_print(const char *format, va_list *arg)
 {
-	char	*text = NULL;
-	int		size;
-	char	*choped;
-	t_mod	data;
+	char				*text = NULL;
+	int					size;
+	char				*choped;
+	t_mod				data;
 	unsigned long int	i;
 
 	i = -1;
 	size = 0;
 	while (++i < ft_strlen(format))
 	{
-		if (format[i] == '%' && format[i + 1] != '%' && format[i + 1] != '\0')
+		if (format[i] == '%' && format[i + 1] != '%')
 		{
 			choped = ft_strdup(chop_format(format, &i));
 			if (choped != NULL)
@@ -876,5 +909,5 @@ int main (int argc, char **argv)
 		printf("width mod = %d\n", flag.width);
 		printf("precision mod = %d\n", flag.precision);
 		printf("procent mod = %d\n", flag.procent);
-		return (0);
+ 	 	return (0);
 }*/
