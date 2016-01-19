@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 15:51:02 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/19 19:07:49 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,6 +272,8 @@ void	process_flags(char *choped, t_mod *data)
 			data->minus_mod = 1;
 		else if (choped[i] == '+')
 			data->plus_mod = 1;
+		else if (choped[i] == '%')
+			data->procent = 1;
 		else if (choped[i] == ' ')
 			data->space_mod = 1;
 		else if (choped[i] == '.' && (!ft_isdigit(choped[i + 1]) || \
@@ -520,7 +522,7 @@ void	no_case_for_strings(t_mod *data, va_list *arg)
 	else if (data->specifier == 'c')
 	{
 		data->chr = va_arg(*arg, int);
-		data->result[0] = data->chr;	
+		data->result[0] = data->chr;
 	}
 }
 
@@ -549,7 +551,7 @@ void	no_case(t_mod *data, va_list *arg)
 
 //----------------------IS <<<<< U >>>> <<< D >>> <<<< O >>>> -------------
 
-void	is_UDOSC(t_mod *data, va_list *arg)
+void	is_UDO(t_mod *data, va_list *arg)
 {
 	unsigned long	other_base;
 	long			decimal;
@@ -572,6 +574,24 @@ void	is_UDOSC(t_mod *data, va_list *arg)
 		data->wstr[0] = va_arg(*arg, wint_t);
 }
 
+void	is_SCP(t_mod *data, va_list *arg)
+{
+	unsigned long long p;
+
+	p = 0;
+	if (data->specifier == 'S')
+		data->wstr = va_arg(*arg, wchar_t*);
+	else if (data->specifier == 'C')
+		data->wstr[0] = va_arg(*arg, wint_t);
+	else if (data->specifier == 'p')
+	{
+		p = (unsigned long long)va_arg(*arg, void*);
+		data->result = ft_lutoa_base(p, 16, "0123456789abcdef");
+		if (data->precision == 0)
+			data->result = ft_strjoin("0x", data->result);
+	}
+}
+
 //----------------------EDIT CORE -----------------------
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
@@ -586,7 +606,8 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 		ll_case(data, arg);
 	else
 		no_case(data, arg);
-	is_UDOSC(data, arg);
+	is_UDO(data, arg);
+	is_SCP(data, arg);
 }
 
 //--------prototype------------
@@ -679,6 +700,8 @@ void	compute_precision(t_mod *data)
 		data->precizie = ft_strjoin("-", data->precizie);
 	}
 	data->result = ft_strjoin(data->precizie, data->result);
+	if (data->specifier == 'p')
+		data->result = ft_strjoin("0x", data->result);
 }
 
 //------CONCATENATE THE NECESARY WIDTH ( the result already has precision)------
@@ -761,11 +784,14 @@ void	case_zero(t_mod *data)
 
 void	case_dot(t_mod *data)
 {
-	if (data->result[0] == '0' && !(data->hash_mod == 1 && \
+	if (data->result[0] == '0' &&!(data->hash_mod == 1 && \
 				(data->specifier == 'o' || data->specifier == 'O')))
 		data->result = ft_strdup("");
-	else if (data->specifier == 's' || data->specifier == 'c')
+	else if (data->specifier == 's' || (data->specifier == 'c' && \
+				data->result[0] == '\0'))
 		data->result = ft_strdup("");
+	if (data->specifier == 'p')
+		data->result = ft_strjoin("0x", data->result);
 }
 
 //------------------------IF WE HAVE STRINGS-----------
@@ -834,7 +860,8 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 	edit_based_on_mods(data, arg);
 	if (data->result == NULL)
 		return (NULL);
-	if (data->result[0] == '\0' && data->specifier != 's')
+	if (data->result[0] == '\0' && data->specifier != 's' && \
+		   	data->specifier != 'p')
 		*size = *size + 1;
 	edit_based_on_flags(data);
 	text = ft_strdup(data->result);
@@ -854,15 +881,28 @@ int		no_procent(const char *format)
 	return (0);
 }
 
+int		double_procent(t_mod *data)
+{
+	if (data->procent == 1)
+	{
+		ft_putchar('%');
+		return (1);
+	}
+	return (0);
+}
+
 int		how_much_to_print(char *text, t_mod *data)
 {
 	int len;
 
+	len = 0;
 	if (text == NULL)
 	{
 		ft_putstr("(null)");
 		return (6);
 	}
+	else if (double_procent(data))
+		len++;
 	len = ft_strlen(data->result);
 	ft_putstr(text);
 	if (data->chr == '\0')
@@ -894,7 +934,7 @@ int		what_to_print(const char *format, va_list *arg)
 	size = 0;
 	while (++i < ft_strlen(format))
 	{
-		if (format[i] == '%' && format[i - 1] != '%')
+		if (format[i] == '%')
 		{
 			choped = ft_strdup(chop_format(format, &i));
 			if (choped != NULL)
@@ -931,16 +971,17 @@ int main (int argc, char **argv)
 {
 	int n;
 	int a;
+	//int i = 31;
 
 	argc = argc + 1 - 1;	
-	a = printf(argv[1], ft_atoi(argv[2]));
+	a = printf(argv[1], 0);
 	printf("<<<<");
 	printf("\n");
-	n =	ft_printf(argv[1], ft_atoi(argv[2]));
+	n =	ft_printf(argv[1], 0);
 	printf("\tOriginal size = %d\tMy size = %d\n", a, n);
 
 
-		process_flags(choped, &flag);
+	process_flags(choped, &flag);
 
 		printf("dot = %d\n", flag.dot_mod);
 		printf("h mod = %d\n", flag.h_mod);
