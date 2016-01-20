@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/18 17:48:06 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/19 18:34:40 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 #define FLAGS "0123456789 -+#0.hljz"
 
-#define SPECIFIERS "sSpdDioOuUxXcC"
+#define SPECIFIERS "sSpdDioOuUxXcC%"
 
 typedef struct	s_mod
 {
@@ -46,6 +46,7 @@ typedef struct	s_mod
 	int		width_size;
 	int		precision_size;
 	int		size;
+	char	chr;
 	char	*result;
 	char	*choped;
 	char	*precizie;

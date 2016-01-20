@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 13:46:42 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/20 19:11:32 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,4 +93,12 @@ char				*ft_space_remove(char *str);
 int					ft_sqrt(int n);
 char				*ft_strrev(char *str);
 int					ft_neg(int n);
+wchar_t				*ft_wstrjoin(wchar_t const *s1, wchar_t const *s2);
+wchar_t				*ft_wstrdup(const wchar_t *s1);
+int					ft_wstrlen(const wchar_t *s);
+wchar_t				*ft_wmemset(wchar_t *b, wchar_t c, size_t len);
+void				ft_putwstr(wchar_t *str);
+int					ft_wstrsize(wchar_t *wstr);
+wchar_t				*ft_wstrsub(wchar_t *s, unsigned int start, size_t len);
+int					ft_wcharsize(wchar_t wc);
 #endif

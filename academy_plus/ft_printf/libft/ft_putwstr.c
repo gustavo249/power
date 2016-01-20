@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tst.c                                              :+:      :+:    :+:   */
+/*   ft_putwstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 18:02:27 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/20 16:21:00 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/20 16:26:16 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+#include "libft.h"
 
-int main (int argc, char **argv)
+void	ft_putwstr(wchar_t *str)
 {
-	printf(argv[1], atoi(argv[2]));
-	return (0);
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		ft_putwchar(str[i]);
+		i++;
+	}
 }

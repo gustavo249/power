@@ -1,21 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tst.c                                              :+:      :+:    :+:   */
+/*   ft_wmemset.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 18:02:27 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/20 16:31:29 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/20 16:40:54 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+#include "libft.h"
 
-int main (int argc, char **argv)
+wchar_t		*ft_wmemset(wchar_t *b, wchar_t c, size_t len)
 {
-	printf(argv[1], atoi(argv[2]));
-	return (0);
+	size_t i;
+
+	i = 0;
+	while (i < len)
+	{
+		b[i] = c;
+		i++;
+	}
+	return (b);
 }

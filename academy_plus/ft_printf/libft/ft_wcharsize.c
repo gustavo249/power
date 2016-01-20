@@ -1,21 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tst.c                                              :+:      :+:    :+:   */
+/*   ft_wcharsize.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/01/12 16:20:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 18:02:27 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/01/20 19:10:31 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/01/20 19:10:46 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+#include "libft.h"
 
-int main (int argc, char **argv)
+int		ft_wcharsize(wchar_t wc)
 {
-	printf(argv[1], atoi(argv[2]));
-	return (0);
+	int size;
+
+	size = 0;
+	if (wc <= 127)
+		size = 1;
+	else if (wc <= 2047)
+		size = 2;
+	else if (wc <= 65535)
+		size = 3;
+	else if (wc <= 1114111)
+		size = 4;
+	return (size);
 }
