@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 19:07:49 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/20 16:09:04 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ char	*chop_format(const char *format, unsigned long int *i)
 	while (format[k])
 	{
 		if (is_flag(format, &k) == 0 && is_specifier(format, &k) == 0)
-			return (NULL);
+			return (choped);
 		else if (is_specifier(format, &k))
 		{
 			choped[j++] = format[k];
@@ -59,8 +59,6 @@ char	*chop_format(const char *format, unsigned long int *i)
 		k++;
 	}
 	choped[j] = '\0';
-	if (ft_strchr(SPECIFIERS, choped[j - 1]) == NULL)
-		return (NULL);
 	return (choped);
 }
 
@@ -624,13 +622,14 @@ void	stock_width(t_mod *data)
 
 	i = 0;
 	len = 0;
-	k = ft_strlen(data->result);	
+	k = ft_strlen(data->result);
 	p_size = get_precision(data->choped);
 	if (data->result[0] == '\0' || data->plus_mod == 1)
 		k++;
 	if (p_size >= k && p_size > 0 && !no_strings(data))
 		len = get_width(data->choped) - p_size;
-	else if (data->dot_mod == 1 && data->specifier == 's')
+	else if (data->dot_mod == 1 && (data->specifier == 's' || \
+			data->result[0] == '0'))
 		len = get_width(data->choped);
 	else
 		len = get_width(data->choped) - k;
@@ -738,9 +737,9 @@ void	case_hash(t_mod *data)
 
 	len = (int)ft_strlen(data->result);
 	p_size = (int)ft_strlen(data->precizie);
-	if (data->specifier == 'x' && data->result[0] != '0')
+	if (data->specifier == 'x' && data->result[len - 1] != '0')
 		data->result = ft_strjoin("0x", data->result);
-	else if (data->specifier == 'X' && data->result[0] != '0')
+	else if (data->specifier == 'X' && data->result[len - 1] != '0')
 		data->result = ft_strjoin("0X", data->result);
 	else if ((data->specifier == 'o' || data->specifier =='O') && \
 			data->result[0] != '0')
@@ -768,6 +767,7 @@ void	case_zero(t_mod *data)
 	int len;
 
 	i = 0;
+
 
 	len = ft_strlen(data->lungime);
 	while (i < len)
@@ -839,7 +839,7 @@ void	edit_based_on_flags(t_mod *data)
 		case_hash(data);
 	if (data->width == 1)
 		stock_width(data);
-	if (data->zero_mod == 1 && data->dot_mod == 0)
+	if (data->zero_mod == 1)
 		case_zero(data);
 	if (data->plus_mod == 1)
 		case_plus(data);
@@ -859,9 +859,13 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 	text = ft_memalloc(1000);
 	edit_based_on_mods(data, arg);
 	if (data->result == NULL)
-		return (NULL);
-	if (data->result[0] == '\0' && data->specifier != 's' && \
-		   	data->specifier != 'p')
+	{
+		data->result = ft_memalloc(350);
+		data->result = ft_strdup("(null)");
+	}
+	if ((data->result[0] == '\0' && (data->specifier == 'c' || \
+				data->specifier == 'C')) \
+		   	&& data->specifier != 's' && data->specifier != 'p')
 		*size = *size + 1;
 	edit_based_on_flags(data);
 	text = ft_strdup(data->result);
@@ -896,29 +900,35 @@ int		how_much_to_print(char *text, t_mod *data)
 	int len;
 
 	len = 0;
-	if (text == NULL)
-	{
-		ft_putstr("(null)");
-		return (6);
-	}
-	else if (double_procent(data))
-		len++;
-	len = ft_strlen(data->result);
 	ft_putstr(text);
+	len = ft_strlen(data->result);
+	if (double_procent(data))
+		len++;
 	if (data->chr == '\0')
 		ft_putchar('\0');
 	return (len);
 }
+void	is_mizerie(const char *format, unsigned long int *i, \
+		t_mod *data, char *choped)
+{
+	int len;
+
+	len = ft_strlen(choped);
+	if (ft_strchr(SPECIFIERS, choped[len - 1]) == NULL)
+	{
+			data->result[0] = format[*i + ft_strlen(choped) + 1];
+			*i = *i + 1;
+	}
+}
 
 //----------------THE HEART OF THE PROGRAM-------------
 
-void	start_engine(char *text, char *choped, \
-		t_mod *data, unsigned long int *i, int *size, va_list *arg)
+
+void	start_engine(char *text, char *choped, int *size, \
+		t_mod *data, va_list *arg)
 {
-	process_flags(choped, data);
 	data->choped = ft_strdup(choped);
 	text = ft_strdup(convert_based_on_flags(data, arg, size));
-	*i = ft_strlen(choped) + *i;
 	*size = *size + how_much_to_print(text, data);
 }
 
@@ -937,8 +947,10 @@ int		what_to_print(const char *format, va_list *arg)
 		if (format[i] == '%')
 		{
 			choped = ft_strdup(chop_format(format, &i));
-			if (choped != NULL)
-				start_engine(text, choped, &data, &i, &size, arg);
+			process_flags(choped, &data);
+			is_mizerie(format, &i, &data, choped);
+			start_engine(text, choped, &size, &data, arg);
+			i = i + ft_strlen(choped);
 		}
 		else
 		{
