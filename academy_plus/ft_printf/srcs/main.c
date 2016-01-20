@@ -6,11 +6,12 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/20 16:09:04 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/20 20:47:25 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include <locale.h>
 
 
 // ---------------CREATING THE CHOPED--------
@@ -84,7 +85,7 @@ void	init_flags(t_mod *flag)
 	flag->procent = 0;
 	flag->chr = '0';
 	flag->result = ft_memalloc(1000);
-	flag->wstr = ft_memalloc(200);
+	flag->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 200);
 	flag->choped = ft_memalloc(20);
 	flag->precizie = ft_memalloc(200);
 	flag->lungime = ft_memalloc(200);
@@ -566,10 +567,6 @@ void	is_UDO(t_mod *data, va_list *arg)
 		decimal = va_arg(*arg, long);
 		data->result = ft_litoa(decimal);
 	}
-	else if (data->specifier == 'S')
-		data->wstr = va_arg(*arg, wchar_t*);
-	else if (data->specifier == 'C')
-		data->wstr[0] = va_arg(*arg, wint_t);
 }
 
 void	is_SCP(t_mod *data, va_list *arg)
@@ -578,7 +575,7 @@ void	is_SCP(t_mod *data, va_list *arg)
 
 	p = 0;
 	if (data->specifier == 'S')
-		data->wstr = va_arg(*arg, wchar_t*);
+		data->wstr= va_arg(*arg, wchar_t *);
 	else if (data->specifier == 'C')
 		data->wstr[0] = va_arg(*arg, wint_t);
 	else if (data->specifier == 'p')
@@ -594,6 +591,7 @@ void	is_SCP(t_mod *data, va_list *arg)
 
 void	edit_based_on_mods(t_mod *data, va_list *arg)
 {
+
 	if (data->hh_mod == 1)
 		hh_case(data, arg);
 	else if (data->h_mod == 1)
@@ -712,7 +710,8 @@ void	compute_width(t_mod *data)
 		make_positive(data);
 		data->lungime = ft_strjoin("+", data->lungime);
 	}
-	if (data->minus_mod == 1)
+	if (data->minus_mod == 1 || (data->specifier == 'p' && \
+				data->zero_mod == 1 && data->result[0] == '0'))
 		data->result = ft_strjoin(data->result, data->lungime);
 	else
 		data->result = ft_strjoin(data->lungime, data->result);
@@ -821,6 +820,63 @@ void	edit_strings_precision(t_mod *data)
 	}
 }
 
+//--------------------EDIT FLAGS FOR WIDE CHARACTERS---------------
+
+void	wide_precision(t_mod *data)
+{
+	int 	p_size;
+	int		len;
+	wchar_t *aux;
+
+	aux = (wchar_t*)malloc(sizeof(wchar_t) * ft_wstrsize(data->wstr));
+	p_size = get_precision(data->choped);
+	len = ft_wstrsize(data->wstr);
+	if (p_size < ft_wcharsize(data->wstr[0]))
+		data->wstr = ft_wstrdup(L"");
+	else if (p_size < len)
+	{
+		aux = ft_wstrsub(data->wstr, 0, p_size);
+		data->wstr = ft_wstrdup(L"");
+		data->wstr = ft_wstrdup(aux);
+	}
+}
+
+void	wide_width(t_mod *data)
+{
+	int		sum;
+	int		i;
+	wchar_t	*width;
+
+	i = 0;
+	width = (wchar_t*)malloc(sizeof(wchar_t) * get_width(data->choped));
+	if (ft_strcmp("(null)", (char*)data->wstr) == 0)
+		sum = get_width(data->choped);
+	else
+		sum = get_width(data->choped) - ft_wstrsize(data->wstr);
+	if (sum > 0)
+	{
+		while (i < sum)
+		{
+			if (data->zero_mod == 1)
+				width[i++] = '0';
+			else
+				width[i++] = ' ';
+		}
+		if (data->minus_mod == 1)
+			data->wstr = ft_wstrjoin(data->wstr, width);
+		else
+			data->wstr = ft_wstrjoin(width, data->wstr);
+	}
+}
+
+void	edit_wide_flags(t_mod *data)
+{
+	if (data->precision == 1)
+		wide_precision(data);
+	if (data->width == 1)
+		wide_width(data);
+}
+
 //----------------------EDIT FLAGS------------------------------------
 
 void	edit_based_on_flags(t_mod *data)
@@ -848,6 +904,7 @@ void	edit_based_on_flags(t_mod *data)
 	compute_width(data);
 	if (data->space_mod == 1 && data->plus_mod == 0)
 		case_space(data);
+	edit_wide_flags(data);
 }
 
 //---------------------------CONVERTING CORE--------------------
@@ -863,8 +920,12 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 		data->result = ft_memalloc(350);
 		data->result = ft_strdup("(null)");
 	}
-	if ((data->result[0] == '\0' && (data->specifier == 'c' || \
-				data->specifier == 'C')) \
+	else if (data->wstr == NULL)
+	{
+		data->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 100);
+		data->wstr = L"(null)";
+	}
+	if ((data->result[0] == '\0' && data->specifier == 'c') \
 		   	&& data->specifier != 's' && data->specifier != 'p')
 		*size = *size + 1;
 	edit_based_on_flags(data);
@@ -895,13 +956,46 @@ int		double_procent(t_mod *data)
 	return (0);
 }
 
+//------------------WIDE CHARACTES PRINTING--------------
+
+int		not_wide(t_mod *data)
+{
+	if (data->specifier == 'S' || data->specifier == 'C')
+		return (1);
+	else if (data->hh_mod == 1 && data->specifier == 'C')
+		return (1);
+	else if (data->l_mod == 1 && (data->specifier == 's' || \
+				data->specifier == 'c'))
+			return (1);
+	return (0);
+}
+
+int		wide_characters(t_mod *data)
+{
+	int len;
+
+	len = 0;
+	if (data->wstr[0] == '\0' && data->specifier != 'S')
+		len++;
+	len = len + ft_wstrsize(data->wstr);
+	ft_putwstr(data->wstr);
+	return (len);
+}
+
+//---------------------PRINTING FUNCTION------------
+
 int		how_much_to_print(char *text, t_mod *data)
 {
 	int len;
 
 	len = 0;
-	ft_putstr(text);
-	len = ft_strlen(data->result);
+	if (!not_wide(data))
+	{
+		ft_putstr(text);	
+		len = ft_strlen(data->result);
+	}
+	else
+		len = wide_characters(data);
 	if (double_procent(data))
 		len++;
 	if (data->chr == '\0')
@@ -948,8 +1042,9 @@ int		what_to_print(const char *format, va_list *arg)
 		{
 			choped = ft_strdup(chop_format(format, &i));
 			process_flags(choped, &data);
-			is_mizerie(format, &i, &data, choped);
+			is_mizerie(format, &i, &data, choped);	
 			start_engine(text, choped, &size, &data, arg);
+
 			i = i + ft_strlen(choped);
 		}
 		else
@@ -985,6 +1080,7 @@ int main (int argc, char **argv)
 	int a;
 	//int i = 31;
 
+	setlocale(LC_ALL, "");
 	argc = argc + 1 - 1;	
 	a = printf(argv[1], 0);
 	printf("<<<<");
