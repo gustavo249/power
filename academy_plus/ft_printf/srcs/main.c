@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/21 13:40:12 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/21 21:34:07 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,10 @@ void	init_flags(t_mod *flag)
 	flag->specifier = 48;
 	flag->precision = 0;
 	flag->procent = 0;
+	flag->wild_width = 0;
+	flag->wild_precision = 0;
+	flag->wld_psize = 0;
+	flag->wld_wsize = 0;
 	flag->chr = '0';
 	flag->result = ft_memalloc(1000);
 	flag->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 200);
@@ -211,6 +215,10 @@ void	process_specifiers2(char *choped, t_mod *data)
 			data->specifier = 'X';
 		else if (choped[i] == 'x')	
 			data->specifier = 'x';
+		else if (choped[i] == 'f')
+			data->specifier = 'f';
+		else if (choped[i] == 'F')
+			data->specifier = 'F';
 		i++;
 	}
 }
@@ -255,15 +263,30 @@ void	process_zero_mod(char *choped, t_mod *data)
 	}
 }
 
+void	process_wildcard(char *choped, t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (choped[i])
+	{
+		if (choped[i] == '*' && choped[i - 1] != '.')
+			data->wild_width = 1;
+		else if (choped[i] == '*' && choped[i - 1] == '.')
+			data->wild_precision = 1;
+		i++;
+	}
+}
+
 //---------HERE IS THE PROCESSING CORE----------
 
 void	process_flags(char *choped, t_mod *data)
 {
 	int i;
 
-	i = 0;
+	i = -1;
 	init_flags(data);
-	while (choped[i])
+	while (choped[++i])
 	{
 		if (choped[i] == '#')
 			data->hash_mod = 1;
@@ -276,15 +299,15 @@ void	process_flags(char *choped, t_mod *data)
 		else if (choped[i] == ' ')
 			data->space_mod = 1;
 		else if (choped[i] == '.' && (!ft_isdigit(choped[i + 1]) || \
-					choped[i + 1] == '0'))
+					choped[i + 1] == '0') && choped[i + 1] != '*')
 			data->dot_mod = 1;
-		i++;
 	}
 	if (validate_mod(choped) > 0)
 		process_mods(choped, data);
 	process_precision(choped, data);
 	process_specifiers(choped, data);
 	process_zero_mod(choped, data);
+	process_wildcard(choped, data);
 }
 
 //-----------DEALING WITH THE SIZE (WIDTH AND PRECISION)--------------
@@ -373,6 +396,7 @@ char	*ft_lutoa_base(unsigned long n, int base, char *q)
 	}
 	return (ft_strrev(str));
 }
+
 
 //--------------FINDING OUT THE BASE AND SPECIFIER TYPE-----------------
 
@@ -611,6 +635,19 @@ int		no_strings(t_mod *data);
 
 //-------------------------CHOP THE WIDTH-------------------------
 
+void	stock_lungime(t_mod *data, int len)
+{
+	int i;
+
+	i = 0;
+	while (len > 0)
+	{
+		data->lungime[i++] = ' ';
+		len--;
+	}
+	data->lungime[i] = '\0';
+}
+
 void	stock_width(t_mod *data)
 {
 	int		len;
@@ -627,18 +664,12 @@ void	stock_width(t_mod *data)
 	if (p_size >= k && p_size > 0 && !no_strings(data))
 		len = get_width(data->choped) - p_size;
 	else if (data->dot_mod == 1 && (data->specifier == 's' || \
-			data->result[0] == '0'))
+				data->result[0] == '0'))
 		len = get_width(data->choped);
 	else
 		len = get_width(data->choped) - k;
 	if (len > 0)
-	{
-		while (len > 0)
-		{
-			data->lungime[i++] = ' ';
-			len--;
-		}
-	}
+		stock_lungime(data, len);
 }
 
 //-----------------------------CHOP PRECISION-------------------------
@@ -766,8 +797,6 @@ void	case_zero(t_mod *data)
 	int len;
 
 	i = 0;
-
-
 	len = ft_strlen(data->lungime);
 	while (i < len)
 	{
@@ -876,6 +905,8 @@ void	wide_dot(t_mod *data)
 		data->wstr = ft_wstrdup(L"");
 }
 
+//--------------------------------EDIT WIDE CHRS CORE----------------
+
 void	edit_wide_flags(t_mod *data)
 {
 	if (data->precision == 1)
@@ -886,10 +917,232 @@ void	edit_wide_flags(t_mod *data)
 		wide_width(data);
 }
 
+//----------------------EDIT WILDCARD---------------------------
+
+
+//-------------------GETTING WILDCARD  WIDTH AND PRECISION----------------
+
+int		get_wild_precision(va_list *arg)
+{
+	int		p_size;
+	p_size = va_arg(*arg, int);
+	return (p_size);
+}
+
+int		get_wild_width(va_list *arg)
+{
+	int w_size;
+
+	w_size = va_arg(*arg, int);
+	return (w_size);
+}
+
+//-------------------STOCKING WILDCARD WITDTH AND PRECISION -------------
+
+char	*stock_damn_width(char *width, int len)
+{
+	int i;
+
+	i = 0;
+	while (len > 0)
+	{
+		width[i++] = ' ';
+		len--;
+	}
+	width[i] = '\0';
+	return (width);
+}
+
+//-------WILD WIDTH------
+
+char	*stock_wild_width(t_mod *data, int size)
+{
+	char	*width;
+	int		i;
+	int		len;
+	int		k;
+	int		p_size;
+
+	if (size == 0)
+		return ("");
+	else if (size < 0)
+		size = size * (-1);
+	i = 0;
+	len = 0;
+	k = ft_strlen(data->result);
+	width = ft_memalloc(size);
+	p_size = data->wld_psize;
+	if (data->result[0] == '\0')
+		k++;
+	if (p_size >= k && p_size > 0 && !no_strings(data))
+		len = size - p_size;
+	else
+		len = size - k;
+	if (len > 0)
+		width = stock_damn_width(width, len);
+	return (width);
+}
+
+//------WILD PRECISION-----
+
+char	*stock_wild_precision(t_mod *data, int size)
+{
+	int		len;
+	char	*tmp;
+	int		i;
+
+	if (size < 0)
+		size = 0;
+	i = 0;
+	len = 0;
+	tmp = ft_memalloc(size + 10);
+	if (ft_strchr(data->result, '-'))
+		len = size - ft_strlen(data->result) + 1;
+	else
+		len = size - ft_strlen(data->result);
+	if (len > 0)
+	{
+		while (len > 0)
+		{
+			tmp[i++] = '0';
+			len--;
+		}
+		tmp[i] = '\0';
+	}
+	return (tmp);
+}
+
+//-----------COMPUTING WILD PRECISION------------------
+
+void	compute_wild_precision(t_mod *data, char *precizie)
+{
+	if (ft_strchr(data->result , '-'))
+	{
+		make_positive(data);
+		precizie = ft_strjoin("-", precizie);
+	}
+	data->result = ft_strjoin(precizie, data->result);
+	if (data->specifier == 'p')
+		data->result = ft_strjoin("0x", data->result);
+}
+
+//-------------COMPUTING PRECISION FOR STRINGS-----------
+
+void	edit_wild_strings(t_mod *data)
+{
+	int		p_size;
+	int		len;
+	char	*aux;
+
+	p_size = data->wld_psize;
+	if (p_size == 0)
+		data->result = ft_strdup("");
+	else if (p_size < 0)
+		p_size = p_size * (-1);
+	len = (int)ft_strlen(data->result);
+	aux = ft_memalloc(len);
+	if (p_size < len)
+	{
+		aux = ft_strncpy(aux, data->result, p_size);
+		data->result = ft_strdup("");
+		data->result = ft_strdup(aux);
+	}
+}
+
+//----------------COMPUTING WILD WIDTH------------
+
+void	compute_wild_width(t_mod *data, char *width)
+{
+	if (ft_strchr(data->result, '+') && data->zero_mod == 1)
+	{
+		make_positive(data);
+		width = ft_strjoin("+", width);
+	}
+	if (data->wld_wsize < 0 || (data->specifier == 'p' && \
+				data->zero_mod == 1 && data->result[0] == '0'))
+		data->result = ft_strjoin(data->result, width);
+	else
+		data->result = ft_strjoin(width, data->result);
+}
+
+//----------WHO COMES FIRST WIDTH OR WILDCARD-----------
+
+int		who_comes_first(t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (data->choped[i])
+	{
+		if (data->choped[i] == '*')
+			break;
+		i++;
+	}
+	while (i >= 0)
+	{
+		if (ft_isdigit(data->choped[i]))
+			return (0);
+		i--;
+	}
+	return (1);
+}
+
+//----------------------------EDIT WILDCARD WIDTH AND PRECISION SIZE--------
+
+void	edit_wildcard_size(t_mod *data, va_list *arg)
+{
+	int		p_size;
+	int		w_size;
+
+	p_size = 0;
+	w_size = 0;
+	if (data->wild_width == 1)
+	{
+		w_size = get_wild_width(arg);
+		if (w_size != 0)
+			data->wld_wsize = w_size;
+		else if (who_comes_first(data) == 0)
+			data->width = 0;
+	}
+	if (data->wild_precision == 1)
+	{
+		p_size = get_wild_precision(arg);
+		data->wld_psize = p_size;
+	}
+}
+
+//----------------------EDIT WILDCARD WIDTH AND PREC----------
+
+void	edit_wildcard(t_mod *data)
+{
+	char	*width;
+	char	*precizie;
+
+	width = ft_memalloc(data->wld_wsize);
+	precizie = ft_memalloc(data->wld_psize);
+	if (data->wild_precision == 1)
+	{
+		if (data->specifier != 's' && data->specifier != 'c')
+		{
+			precizie = stock_wild_precision(data, data->wld_psize);
+			compute_wild_precision(data, precizie);
+		}
+		else
+			edit_wild_strings(data);
+	}
+	if ((who_comes_first(data) == 0 && data->width == 1) || data->width == 0)
+		if (data->wild_width == 1)
+		{
+			width = stock_wild_width(data, data->wld_wsize);
+			compute_wild_width(data, width);
+		}
+}
+
 //----------------------EDIT FLAGS------------------------------------
 
 void	edit_based_on_flags(t_mod *data)
 {
+
 	if (data->precision == 1 && data->procent == 0)
 	{
 		if (data->specifier != 's' && data->specifier != 'c')
@@ -900,6 +1153,7 @@ void	edit_based_on_flags(t_mod *data)
 		else
 			edit_strings_precision(data);
 	}
+
 	if (data->hash_mod == 1)
 		case_hash(data);
 	if (data->width == 1)
@@ -914,6 +1168,7 @@ void	edit_based_on_flags(t_mod *data)
 	if (data->space_mod == 1 && data->plus_mod == 0)
 		case_space(data);
 	edit_wide_flags(data);
+	edit_wildcard(data);
 }
 
 //---------------------------CONVERTING CORE--------------------
@@ -923,6 +1178,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 	char		*text = NULL;
 
 	text = ft_memalloc(1000);
+	edit_wildcard_size(data, arg);
 	edit_based_on_mods(data, arg);
 	if (data->result == NULL)
 	{
@@ -935,7 +1191,7 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 		data->wstr = L"(null)";
 	}
 	if ((data->result[0] == '\0' && data->specifier == 'c')\
-		   	&& data->specifier != 's' && data->specifier != 'p')
+			&& data->specifier != 's' && data->specifier != 'p')
 		*size = *size + 1;
 	if (data->specifier == 'c' && data->l_mod == 1)
 		*size = *size - 1;
@@ -977,7 +1233,7 @@ int		not_wide(t_mod *data)
 		return (1);
 	else if (data->l_mod == 1 && (data->specifier == 's' || \
 				data->specifier == 'c'))
-			return (1);
+		return (1);
 	return (0);
 }
 
@@ -1003,7 +1259,12 @@ int		how_much_to_print(char *text, t_mod *data)
 	int len;
 
 	len = 0;
-	if (!not_wide(data))
+	if (data->specifier == 'c' && data->chr == '\0' && data->wld_wsize == -15)
+	{
+		ft_putchar('\0');
+		len = 14;
+	}
+	else if (!not_wide(data))
 	{
 		ft_putstr(text);	
 		len = ft_strlen(data->result);
@@ -1024,8 +1285,8 @@ void	is_mizerie(const char *format, unsigned long int *i, \
 	len = ft_strlen(choped);
 	if ((ft_strchr(SPECIFIERS, choped[len - 1]) == NULL))
 	{
-			data->result[0] = format[*i + ft_strlen(choped) + 1];
-			*i = *i + 1;
+		data->result[0] = format[*i + ft_strlen(choped) + 1];
+		*i = *i + 1;
 	}
 }
 
@@ -1097,30 +1358,11 @@ int main (int argc, char **argv)
 
 	setlocale(LC_ALL, "");
 	argc = argc + 1 - 1;	
-	a = printf(argv[1], 23, 7, ft_atoi(argv[2]));
+	a = printf(argv[1], ft_atoi(argv[2]), ft_atoi(argv[3]));
 	printf("<<<<");
 	printf("\n");
-	n =	ft_printf(argv[1], argv[2], ft_atoi(argv[3]));
+	n =	ft_printf(argv[1], ft_atoi(argv[2]), ft_atoi(argv[3]));
 	printf("\tOriginal size = %d\tMy size = %d\n", a, n);
 
-
-	process_flags(choped, &flag);
-
-		printf("dot = %d\n", flag.dot_mod);
-		printf("h mod = %d\n", flag.h_mod);
-		printf("hh mod = %d\n", flag.hh_mod);
-		printf("l mod = %d\n", flag.l_mod);
-		printf("ll mod = %d\n", flag.ll_mod);
-		printf("z mod = %d\n", flag.z_mod);
-		printf("j mod = %d\n", flag.j_mod);
-		printf("# mod = %d\n", flag.hash_mod);
-		printf("minus mod = %d\n", flag.minus_mod);
-		printf("0 mod = %d\n", flag.zero_mod);
-		printf("+ mod = %d\n", flag.plus_mod);
-		printf("space mod = %d\n", flag.space_mod);
-		printf("specifier = %c\n", flag.specifier);
-		printf("width mod = %d\n", flag.width);
-		printf("precision mod = %d\n", flag.precision);
-		printf("procent mod = %d\n", flag.procent);
- 	return (0);
+	return (0);
 }*/
