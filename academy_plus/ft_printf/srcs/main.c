@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/21 12:29:34 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/21 13:40:12 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1029,6 +1029,7 @@ void	is_mizerie(const char *format, unsigned long int *i, \
 	}
 }
 
+
 //----------------THE HEART OF THE PROGRAM-------------
 
 
@@ -1058,7 +1059,6 @@ int		what_to_print(const char *format, va_list *arg)
 			process_flags(choped, &data);
 			is_mizerie(format, &i, &data, choped);	
 			start_engine(text, choped, &size, &data, arg);
-
 			i = i + ft_strlen(choped);
 		}
 		else
@@ -1067,6 +1067,7 @@ int		what_to_print(const char *format, va_list *arg)
 			size++;
 		}
 	}
+	free(data.result);
 	return (size);
 }
 
