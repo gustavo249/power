@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/04 19:52:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/19 18:34:40 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/21 19:31:18 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 #include <ctype.h>
 #include <limits.h>
 
-#define FLAGS "0123456789 -+#0.hljz"
+#define FLAGS "0123456789 *-+#0.hljz"
 
-#define SPECIFIERS "sSpdDioOuUxXcC%"
+#define SPECIFIERS "sSpdDioOuUxXcCfF%"
 
 typedef struct	s_mod
 {
@@ -46,6 +46,10 @@ typedef struct	s_mod
 	int		width_size;
 	int		precision_size;
 	int		size;
+	int		wld_psize;
+	int		wld_wsize;
+	int		wild_width;
+	int		wild_precision;
 	char	chr;
 	char	*result;
 	char	*choped;
@@ -55,32 +59,4 @@ typedef struct	s_mod
 }				t_mod;
 
 
-/*
-int     is_flag(const char *format, int *k);
-int     is_specifier(const char *format, int *k);
-char    *chop_format(const char *format, unsigned long int *i);
-void    init_flags(t_mod *flag);
-void    process_precision(char  *choped, t_mod *data);
-void    process_hhll_mods(char  *choped, t_mod  *data);
-void    process_mods(char *choped, t_mod *data);
-int     is_mod(char c);
-int     is_double_mod(char  *choped, int *i);
-int     validate_mod(char *choped);
-void    process_specifiers2(char *choped, t_mod *data);
-void    process_specifiers(char *choped, t_mod *data);
-void    process_flags(char *choped, t_mod *data);
-int     get_precision(char *choped);
-int     get_width(char *choped);
-int     get_size(char *choped, t_mod *data);
-int		base(t_mod *data);
-void	hh_case(t_mod *data, va_list *arg);
-void	no_case_strings(t_mod *data, va_list *arg);
-void	no_case(t_mod *data, va_list *arg);
-void	edit_based_on_mods(t_mod *data, va_list *arg);
-char    *convert_based_on_flags(t_mod *data, va_list *arg);
-int     no_procent(const char *format);
-int    how_much_to_print(char *choped, char *text, t_mod *data);
-int     what_to_print(const char *format, va_list *arg);
-int     ft_printf(const char *format, ...);
-*/
 #endif

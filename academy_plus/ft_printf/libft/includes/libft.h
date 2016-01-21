@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/20 19:11:32 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/21 19:30:05 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,4 +101,5 @@ void				ft_putwstr(wchar_t *str);
 int					ft_wstrsize(wchar_t *wstr);
 wchar_t				*ft_wstrsub(wchar_t *s, unsigned int start, size_t len);
 int					ft_wcharsize(wchar_t wc);
+void				ftoa(float n, char *res, int afterpoint);
 #endif
