@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/20 20:47:25 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/21 12:29:34 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -862,6 +862,7 @@ void	wide_width(t_mod *data)
 			else
 				width[i++] = ' ';
 		}
+		width[i] = '\0';
 		if (data->minus_mod == 1)
 			data->wstr = ft_wstrjoin(data->wstr, width);
 		else
@@ -869,10 +870,18 @@ void	wide_width(t_mod *data)
 	}
 }
 
+void	wide_dot(t_mod *data)
+{
+	if (data->specifier != 'C')
+		data->wstr = ft_wstrdup(L"");
+}
+
 void	edit_wide_flags(t_mod *data)
 {
 	if (data->precision == 1)
 		wide_precision(data);
+	if (data->dot_mod == 1)
+		wide_dot(data);
 	if (data->width == 1)
 		wide_width(data);
 }
@@ -881,7 +890,7 @@ void	edit_wide_flags(t_mod *data)
 
 void	edit_based_on_flags(t_mod *data)
 {
-	if (data->precision == 1)
+	if (data->precision == 1 && data->procent == 0)
 	{
 		if (data->specifier != 's' && data->specifier != 'c')
 		{
@@ -925,9 +934,11 @@ char	*convert_based_on_flags(t_mod *data, va_list *arg, int *size)
 		data->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 100);
 		data->wstr = L"(null)";
 	}
-	if ((data->result[0] == '\0' && data->specifier == 'c') \
+	if ((data->result[0] == '\0' && data->specifier == 'c')\
 		   	&& data->specifier != 's' && data->specifier != 'p')
 		*size = *size + 1;
+	if (data->specifier == 'c' && data->l_mod == 1)
+		*size = *size - 1;
 	edit_based_on_flags(data);
 	text = ft_strdup(data->result);
 	return (text);
@@ -976,7 +987,10 @@ int		wide_characters(t_mod *data)
 
 	len = 0;
 	if (data->wstr[0] == '\0' && data->specifier != 'S')
+	{
+		ft_putchar('\0');
 		len++;
+	}
 	len = len + ft_wstrsize(data->wstr);
 	ft_putwstr(data->wstr);
 	return (len);
@@ -1008,7 +1022,7 @@ void	is_mizerie(const char *format, unsigned long int *i, \
 	int len;
 
 	len = ft_strlen(choped);
-	if (ft_strchr(SPECIFIERS, choped[len - 1]) == NULL)
+	if ((ft_strchr(SPECIFIERS, choped[len - 1]) == NULL))
 	{
 			data->result[0] = format[*i + ft_strlen(choped) + 1];
 			*i = *i + 1;
@@ -1076,16 +1090,16 @@ int		ft_printf(const char *format, ...)
 /*
 int main (int argc, char **argv)
 {
-	int n;
+	int n = 0;
 	int a;
 	//int i = 31;
 
 	setlocale(LC_ALL, "");
 	argc = argc + 1 - 1;	
-	a = printf(argv[1], 0);
+	a = printf(argv[1], 23, 7, ft_atoi(argv[2]));
 	printf("<<<<");
 	printf("\n");
-	n =	ft_printf(argv[1], 0);
+	n =	ft_printf(argv[1], argv[2], ft_atoi(argv[3]));
 	printf("\tOriginal size = %d\tMy size = %d\n", a, n);
 
 
