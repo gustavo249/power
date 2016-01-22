@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/11 17:12:08 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/11 17:13:42 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/22 16:25:46 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 char	*ft_strrev(char *str)
 {
-	int i;
-	int j;
-	char aux;
+	int		i;
+	int		j;
+	char	aux;
 
 	i = 0;
 	j = ft_strlen(str) - 1;

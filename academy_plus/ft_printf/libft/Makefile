@@ -6,7 +6,7 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/11/03 13:32:44 by rcrisan           #+#    #+#              #
-#    Updated: 2016/01/21 19:30:23 by rcrisan          ###   ########.fr        #
+#    Updated: 2016/01/22 16:22:28 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ SRCS = ft_memccpy.c   ft_putnbr.c       ft_strequ.c    ft_strnequ.c\
        ft_sqrt.c      ft_putnstr.c     ft_strrev.c     ft_nr_cifre.c   ft_wstrsub.c\
 	   ft_itoa_base.c ft_neg.c		   ft_litoa.c	   ft_putwchar.c   ft_wstrsize.c\
 	   ft_putwstr.c	  ft_wstrjoin.c    ft_wstrdup.c    ft_wmemset.c    ft_wstrlen.c\
-	   ft_wcharsize.c ft_ftoa.c\
+	   ft_wcharsize.c\
 
 OBJ = $(SRCS:.c=.o)
 

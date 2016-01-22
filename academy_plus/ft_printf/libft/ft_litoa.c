@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/15 12:11:50 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/15 12:13:44 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/22 16:24:29 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ static int		long_nr_cifre(long int n)
 	return (i);
 }
 
-static char     *n_is_zero(char *str)
+static char		*n_is_zero(char *str)
 {
 	str[0] = '0';
 	str[1] = '\0';
 	return (str);
 }
 
-static void     smaller_than_zero(char *str, long int n, int *i)
+static void		smaller_than_zero(char *str, long int n, int *i)
 {
 	if (n < 0)
 	{
@@ -41,10 +41,10 @@ static void     smaller_than_zero(char *str, long int n, int *i)
 	}
 }
 
-char    *ft_litoa(long int n)
+char			*ft_litoa(long int n)
 {
-	int i;
-	char *s;
+	int		i;
+	char	*s;
 
 	i = long_nr_cifre(n);
 	s = (char*)malloc(sizeof(s) * i + 2);

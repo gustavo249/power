@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/12 12:47:17 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/12 13:23:02 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/22 16:26:39 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ static void		smaller_than_zero(char *str, int n, int *i)
 	}
 }
 
-char	*ft_itoa(int n)
+char			*ft_itoa(int n)
 {
-	int i;
-	char *s;
+	int		i;
+	char	*s;
 
 	i = ft_nr_cifre(n);
 	s = (char*)malloc(sizeof(s) * i + 2);
