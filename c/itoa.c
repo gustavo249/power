@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/28 12:14:32 by rcrisan           #+#    #+#             */
-/*   Updated: 2015/11/28 12:48:38 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/06 18:51:33 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,20 +48,19 @@ char	*ft_itoa(int n)
 	{
 		if (n % 10 < 0)
 			str[i] = -(n % 10) + '0';
-		else
-			str[i] = n % 10 + '0';
+		str[i] = n % 10 + '0';
 		n = n / 10;
 		i--;
 	}
 	return (str);
 }
 
-int main (int argc, char **argv)
+int main (void)
 {
-	int a;
+	//int a;
 
-	argc = argc - 1 + 1;
-	a = atoi(argv[1]);
-	printf("%s\n", ft_itoa(a));
+	//argc = argc - 1 + 1;
+	//a = atoi(argv[1]);
+	printf("%s\n", ft_itoa(-2147483648));
 	return (0);
 }
