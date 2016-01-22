@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/29 13:30:56 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/21 21:34:07 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/22 14:56:21 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,16 @@ char	*chop_format(const char *format, unsigned long int *i)
 
 //--------------PROCESSING FLAGS----------------
 
+void	init_flags2(t_mod *flag)
+{
+	flag->chr = '0';
+	flag->result = ft_memalloc(1000);
+	flag->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 200);
+	flag->choped = ft_memalloc(20);
+	flag->precizie = ft_memalloc(200);
+	flag->lungime = ft_memalloc(200);
+}
+
 void	init_flags(t_mod *flag)
 {
 	flag->dot_mod = 0;
@@ -87,12 +97,7 @@ void	init_flags(t_mod *flag)
 	flag->wild_precision = 0;
 	flag->wld_psize = 0;
 	flag->wld_wsize = 0;
-	flag->chr = '0';
-	flag->result = ft_memalloc(1000);
-	flag->wstr = (wchar_t*)malloc(sizeof(wchar_t) * 200);
-	flag->choped = ft_memalloc(20);
-	flag->precizie = ft_memalloc(200);
-	flag->lungime = ft_memalloc(200);
+	init_flags2(flag);
 }
 
 void	process_precision(char	*choped, t_mod *data)
@@ -263,6 +268,22 @@ void	process_zero_mod(char *choped, t_mod *data)
 	}
 }
 
+void	process_dot_mod(char *choped, t_mod *data)
+{
+	int i;
+
+	i = 0;
+	while (choped[i])
+	{
+		if (choped[i] == '.' && (!ft_isdigit(choped[i + 1]) || \
+					choped[i + 1] == '0') && choped[i + 1] != '*')
+		{
+			data->dot_mod = 1;
+		}
+		i++;
+	}
+}
+
 void	process_wildcard(char *choped, t_mod *data)
 {
 	int i;
@@ -298,14 +319,13 @@ void	process_flags(char *choped, t_mod *data)
 			data->procent = 1;
 		else if (choped[i] == ' ')
 			data->space_mod = 1;
-		else if (choped[i] == '.' && (!ft_isdigit(choped[i + 1]) || \
-					choped[i + 1] == '0') && choped[i + 1] != '*')
-			data->dot_mod = 1;
 	}
 	if (validate_mod(choped) > 0)
 		process_mods(choped, data);
+	data->choped = choped;
 	process_precision(choped, data);
 	process_specifiers(choped, data);
+	process_dot_mod(choped, data);
 	process_zero_mod(choped, data);
 	process_wildcard(choped, data);
 }
@@ -431,9 +451,9 @@ void	hh_case(t_mod *data, va_list *arg)
 {
 	char			decimal;
 	unsigned char	other_base;
-	char			*Q;
+	char			*bq;
 
-	Q = "0123456789ABCDEF";
+	bq = "0123456789ABCDEF";
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
@@ -447,7 +467,7 @@ void	hh_case(t_mod *data, va_list *arg)
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_utoa_base(other_base, base(data), Q);
+		data->result = ft_utoa_base(other_base, base(data), bq);
 	}
 }
 
@@ -455,9 +475,9 @@ void	h_case(t_mod *data, va_list *arg)
 {
 	short 					decimal;
 	unsigned short			other_base;
-	char					*Q;
+	char					*bq;
 
-	Q = "0123456789ABCDEF";
+	bq = "0123456789ABCDEF";
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
 		decimal = va_arg(*arg, int);
@@ -471,7 +491,7 @@ void	h_case(t_mod *data, va_list *arg)
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned int);
-		data->result = ft_utoa_base(other_base, base(data), Q);
+		data->result = ft_utoa_base(other_base, base(data), bq);
 	}
 }
 
@@ -487,10 +507,10 @@ void	l_case(t_mod *data, va_list *arg)
 {
 	long 					decimal;
 	unsigned long			other_base;
-	char					*Q;
+	char					*bq;
 	char					*q;
 
-	Q = "0123456789ABCDEF";
+	bq = "0123456789ABCDEF";
 	q = "0123456789abcdef";
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
@@ -505,7 +525,7 @@ void	l_case(t_mod *data, va_list *arg)
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned long);
-		data->result = ft_lutoa_base(other_base, base(data), Q);
+		data->result = ft_lutoa_base(other_base, base(data), bq);
 	}
 	l_case_for_strings(data, arg);
 }
@@ -515,9 +535,9 @@ void	ll_case(t_mod *data, va_list *arg)
 	unsigned long long int	other_base;
 	long long int 			decimal;
 	char					*q;
-	char					*Q;
+	char					*bq;
 
-	Q = "0123456789ABCDEF";
+	bq = "0123456789ABCDEF";
 	q = "0123456789abcdef";
 	if (data->specifier == 'd' || data->specifier == 'i')
 	{
@@ -532,7 +552,7 @@ void	ll_case(t_mod *data, va_list *arg)
 	else if (data->specifier == 'X')
 	{
 		other_base = va_arg(*arg, unsigned long long);
-		data->result = ft_lutoa_base(other_base, base(data), Q);
+		data->result = ft_lutoa_base(other_base, base(data), bq);
 	}
 }
 
@@ -574,7 +594,7 @@ void	no_case(t_mod *data, va_list *arg)
 
 //----------------------IS <<<<< U >>>> <<< D >>> <<<< O >>>> -------------
 
-void	is_UDO(t_mod *data, va_list *arg)
+void	is_udo(t_mod *data, va_list *arg)
 {
 	unsigned long	other_base;
 	long			decimal;
@@ -593,7 +613,7 @@ void	is_UDO(t_mod *data, va_list *arg)
 	}
 }
 
-void	is_SCP(t_mod *data, va_list *arg)
+void	is_scp(t_mod *data, va_list *arg)
 {
 	unsigned long long p;
 
@@ -626,12 +646,9 @@ void	edit_based_on_mods(t_mod *data, va_list *arg)
 		ll_case(data, arg);
 	else
 		no_case(data, arg);
-	is_UDO(data, arg);
-	is_SCP(data, arg);
+	is_udo(data, arg);
+	is_scp(data, arg);
 }
-
-//--------prototype------------
-int		no_strings(t_mod *data);
 
 //-------------------------CHOP THE WIDTH-------------------------
 
@@ -784,10 +801,13 @@ void	case_space(t_mod *data)
 				data->specifier == 'd' || data->specifier == 'i') && \
 			data->width == 0)
 		data->result = ft_strjoin(" ", data->result);
-	else if (ft_strchr(data->result, '-') == NULL && (data->specifier == 'D' || \
-				data->specifier == 'd' || data->specifier == 'i') && \
-			data->width == 1 && data->zero_mod == 1)
+	else if (ft_strchr(data->result, '-') == NULL && \
+			(data->specifier == 'D' || data->specifier == 'd' \
+			 || data->specifier == 'i') && data->width == 1 && \
+			data->zero_mod == 1)
+	{
 		data->result[0] = ' ';
+	}
 
 }
 
@@ -1142,7 +1162,6 @@ void	edit_wildcard(t_mod *data)
 
 void	edit_based_on_flags(t_mod *data)
 {
-
 	if (data->precision == 1 && data->procent == 0)
 	{
 		if (data->specifier != 's' && data->specifier != 'c')
@@ -1153,7 +1172,6 @@ void	edit_based_on_flags(t_mod *data)
 		else
 			edit_strings_precision(data);
 	}
-
 	if (data->hash_mod == 1)
 		case_hash(data);
 	if (data->width == 1)
@@ -1275,6 +1293,7 @@ int		how_much_to_print(char *text, t_mod *data)
 		len++;
 	if (data->chr == '\0')
 		ft_putchar('\0');
+	free(data->result);
 	return (len);
 }
 void	is_mizerie(const char *format, unsigned long int *i, \
@@ -1294,10 +1313,9 @@ void	is_mizerie(const char *format, unsigned long int *i, \
 //----------------THE HEART OF THE PROGRAM-------------
 
 
-void	start_engine(char *text, char *choped, int *size, \
+void	start_engine(char *text, int *size, \
 		t_mod *data, va_list *arg)
 {
-	data->choped = ft_strdup(choped);
 	text = ft_strdup(convert_based_on_flags(data, arg, size));
 	*size = *size + how_much_to_print(text, data);
 }
@@ -1319,7 +1337,7 @@ int		what_to_print(const char *format, va_list *arg)
 			choped = ft_strdup(chop_format(format, &i));
 			process_flags(choped, &data);
 			is_mizerie(format, &i, &data, choped);	
-			start_engine(text, choped, &size, &data, arg);
+			start_engine(text, &size, &data, arg);
 			i = i + ft_strlen(choped);
 		}
 		else
@@ -1328,7 +1346,6 @@ int		what_to_print(const char *format, va_list *arg)
 			size++;
 		}
 	}
-	free(data.result);
 	return (size);
 }
 
