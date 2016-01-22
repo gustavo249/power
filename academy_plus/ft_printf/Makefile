@@ -6,7 +6,7 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/01/04 19:15:51 by rcrisan           #+#    #+#              #
-#    Updated: 2016/01/22 16:31:20 by rcrisan          ###   ########.fr        #
+#    Updated: 2016/01/22 20:15:34 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ OBJ = *.o
 all: $(NAME)
 
 $(NAME):
-	@$(CC) -c $(SRCS) -I./includes -I./libft/includes
+	@$(CC) -c $(SRCS) -I./includes
 	@ar rc $(NAME) $(OBJ)
 	@ranlib $(NAME)
 
