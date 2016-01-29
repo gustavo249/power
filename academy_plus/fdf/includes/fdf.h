@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/25 14:24:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/25 17:39:28 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/29 18:45:30 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@ typedef struct	s_env
 {
 	void		*mlx;
 	void		*win;
-}				t_env;
+	int			rows;
+	int			cols;
+	int			content_size;
+	int			**matrix;
+	int			error;
+	char		**content;
+}				t_mod;
 
-int		expose_hook(t_env *e);
-void	draw(void *mlx, void *win);
-int		key_hook(int keycode, t_env *e);
-int		mouse_hook(int button,int x, int y, t_env *e);
-void	init_struct(t_env *e);
-void	read_matrix(void);
 #endif

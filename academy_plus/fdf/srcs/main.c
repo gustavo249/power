@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/29 19:21:49 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/29 19:27:52 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	init_struct(t_mod *data)
 {
 	data->rows = 0;
 	data->cols = 0;
+	data->error = 0;
 }
 
 int		validate_content(char	*content)
@@ -102,6 +103,8 @@ int		**add_first_row(t_mod *data, char **first_row, int fd, int **matrix)
 
 		matrix = add_new_row(matrix, first_row, data);
 	}
+	else
+		data->error = 1;
 	return (matrix);
 
 }
@@ -117,9 +120,9 @@ int		read_matrix(int fd, t_mod *data)
 	matrix = NULL;
 	i = 0;
 	cols = 0;
+	matrix = add_first_row(data, first_row, fd, matrix);
 	if (data->error == 1)
 		return (-1);
-	matrix = add_first_row(data, first_row, fd, matrix);
 	while (get_next_line(fd, &line))
 	{
 		cols = 0;

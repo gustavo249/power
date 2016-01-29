@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/03 16:52:40 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/25 16:10:36 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/27 19:34:41 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 
-# define BUFF_SIZE 1
+# define BUFF_SIZE 10000
 
 typedef struct		s_list
 {
