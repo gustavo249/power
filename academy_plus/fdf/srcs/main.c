@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/28 15:54:56 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/29 19:21:49 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,25 @@ int		validate_content(char	*content)
 	return (1);
 }
 
+int		**add_new_content(int **new_matrix, char **row, t_mod *data, int *i)
+{
+	int j;
+	int k;
+	int p;
+
+	p = *i;
+	new_matrix[p] = (int*)malloc(sizeof(int) * data->cols);
+	k = 0;
+	j = 0;
+	while (row[k])
+	{
+		new_matrix[p][j] = ft_atoi(row[k]);
+		k++;
+		j++;
+	}
+	return (new_matrix);
+}
+
 int		**add_new_row(int **matrix, char **row, t_mod *data)
 {
 	int		**new_matrix;
@@ -47,33 +66,44 @@ int		**add_new_row(int **matrix, char **row, t_mod *data)
 		j = 0;
 		while (j < data->cols)
 		{
-			new_matrix[i][j] = matrix[i][j];
+			new_matrix[i][j] = matrix[i][j];	
 			j++;
 		}
 		i++;
 	}
-	new_matrix[i] = (int*)malloc(sizeof(int) * data->cols);
-	k = 0;
-	j = 0;
-	while (row[k])
-	{
-		new_matrix[i][j] = ft_atoi(row[k]);
-		k++;
-		j++;
-	}
+	new_matrix = add_new_content(new_matrix, row, data, &i);
 	return (new_matrix);
 }
 
 void	print_matrix(int	**matrix, t_mod *data)
 {
 	int i, j;
-	
+
 	for (i = 0; i < data->rows; i++)
 	{
 		for (j = 0; j < data->cols; j++)
-			printf("%d  ", matrix[i][j]);
+			printf(" %d", matrix[i][j]);
 		printf("\n");
 	}
+}
+
+int		**add_first_row(t_mod *data, char **first_row, int fd, int **matrix)
+{
+	char	*line;
+
+	get_next_line(fd, &line);
+
+	if (line != NULL)
+	{
+		first_row = ft_strsplit(line, ' ');	
+		while (first_row[data->cols] != '\0')
+			data->cols++;
+		data->rows++;
+
+		matrix = add_new_row(matrix, first_row, data);
+	}
+	return (matrix);
+
 }
 
 int		read_matrix(int fd, t_mod *data)
@@ -87,27 +117,15 @@ int		read_matrix(int fd, t_mod *data)
 	matrix = NULL;
 	i = 0;
 	cols = 0;
-	get_next_line(fd, &line);
-	first_row = ft_strsplit(line, ' ');
-	while (first_row[cols] != '\0')
-	{
-		if (validate_content(first_row[cols]) < 0)
-			return (-1);
-		cols++;
-	}
-	data->rows++;
-	data->cols = cols;
-	matrix = add_new_row(matrix, first_row, data);
+	if (data->error == 1)
+		return (-1);
+	matrix = add_first_row(data, first_row, fd, matrix);
 	while (get_next_line(fd, &line))
 	{
 		cols = 0;
 		first_row = ft_strsplit(line, ' ');
 		while (first_row[cols] != '\0')
-		{
-			if (validate_content(first_row[cols]) < 0)
-				return (-1);
 			cols++;
-		}
 		if (cols != data->cols)
 			return (-1);
 		data->rows++;
