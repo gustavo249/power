@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/30 14:48:02 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/30 17:57:52 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void	init_struct(t_mod *data)
 	data->rows = 0;
 	data->cols = 0;
 	data->error = 0;
+	data->x = 100;
+	data->y = 500;
 }
 
 int		**add_new_content(int **new_matrix, t_mod *data, int *i)
@@ -118,29 +120,109 @@ int		read_matrix(int fd, t_mod *data)
 		data->matrix = add_new_row(data);
 	}
 	print_matrix(data);
+
+	printf("ROWS = %d\tCOLS =%d\n", data->rows, data->cols);
 	return (1);
 }
 
-void	draw_line(t_mod *data)
+void draw_x_axis(t_mod *data)
 {
-	int x;
-	int y;
+	int i;
+	int j;
+	int k;
 
-	y = 200;
-	while (y < 200)
+	i = 0;
+	data->y = 500;
+	while (i < data->rows)
 	{
-		x = 100;
-		while (x < 200)
+		j = 0;
+		data->x = 100;
+		while (j < data->cols - 1)
 		{
-			mlx_pixel_put(data->mlx, data->win, x, y, 0xFF0000);
-			x++;
+			k = data->line_size;
+			while (k >= 0)	
+			{
+				mlx_pixel_put(data->mlx, data->win, data->x, data->y, 0xFF0000);
+				k--;
+				data->x++;
+			}
+			j++;
 		}
-		y++;
+		data->y = data->y + data->line_size;
+		i++;
 	}
+}
+
+void	draw_y_axis(t_mod *data)
+{
+	int i;
+	int j;
+	int k;
+
+	i = 0;
+	data->x = 100;
+	while (i < data->cols)
+	{
+		j = 0;
+		data->y = 500;
+		while (j < data->rows - 1)
+		{
+			k = data->line_size;
+			while (k >= 0)
+			{
+				mlx_pixel_put(data->mlx, data->win, data->x, data->y, 0xFF0000);
+				k--;
+				data->y++;
+			}
+			j++;
+		}
+		data->x += data->line_size;
+		i++;
+	}
+}
+
+void	draw(t_mod *data)
+{
+	draw_x_axis(data);
+	draw_y_axis(data);
+}
+
+int key_hook(int keycode, t_mod *data)
+{
+	if (keycode == 53)
+	{
+		mlx_destroy_window(data->mlx, data->win);
+		exit(0);
+	}
+	return (0);
+}
+
+void	get_size(t_mod *data)
+{
+	if (data->rows < 10 || data->cols < 10)
+		data->line_size = 20;
+	else if (data->rows < 30 || data->cols < 30)
+		data->line_size = 15;
+	else if (data->rows < 50 || data->cols < 50)
+		data->line_size = 10;
+	else if (data->rows < 100 || data->cols < 100)
+		data->line_size = 8;
+	else if (data->rows > 100 || data->cols > 100)
+		data->line_size = 3;
+}
+
+int		draw_line(t_mod *data)
+{
+	get_size(data);
+	draw(data);
+	return (0);
 }
 
 void	draw_map(t_mod *data)
 {
+	data->mlx = mlx_init();
+	data->win = mlx_new_window(data->mlx, 1000, 1000, "win");
+	mlx_key_hook(data->win, key_hook, data);
 	mlx_expose_hook(data->win, draw_line, data);
 	mlx_loop(data->mlx);
 	sleep(10);
@@ -156,6 +238,7 @@ int main (int argc, char **argv)
 	fd = open (argv[1], O_RDONLY);
 	init_struct(&data);
 	read_matrix(fd, &data);
-	draw_map(&data);
+	draw_map(&data);	
 	close(fd);
+	return (0);
 }
