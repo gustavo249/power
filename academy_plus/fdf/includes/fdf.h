@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/25 14:24:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/29 18:45:30 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/30 19:08:47 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,15 @@ typedef struct	s_env
 	void		*win;
 	int			rows;
 	int			cols;
-	int			content_size;
 	int			**matrix;
 	int			error;
 	char		**content;
+	int			line_size;
+	float		old_x;
+	float		old_y;
+	float		x;
+	float		y;
+	float		z;
 }				t_mod;
 
 #endif

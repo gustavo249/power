@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/30 17:57:52 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/01/30 19:08:45 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,58 @@ int		read_matrix(int fd, t_mod *data)
 	return (1);
 }
 
+void	get_coord(t_mod *data)
+{
+	data->x = data->x / data->z;
+	data->y = data->y / data->z;
+}
+
+void	get_z(t_mod *data)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < data->rows)
+	{
+		j = 0;
+		while (j < data->cols)
+		{
+			data->z = data->matrix[i][j];
+			if (data->z > 0)
+				get_coord(data);
+			j++;
+		}
+		i++;
+	}
+}
+
+void	draw_between_points(t_mod *data)
+{
+	float x;
+	float y;
+	float x1;
+	float y1;
+	int k;
+
+	printf("X = %f\tY = %f\n", data->x, data->y);
+	x = data->x;
+	y = data->y;
+	k = data->line_size;
+	get_z(data);
+	x1 = data->x;
+	y1= data->y;
+
+	
+
+}
+
+void	reset_coord(t_mod *data)
+{
+	data->x = 100 + data->line_size;
+	data->y = 500 + data->line_size;
+}
+
 void draw_x_axis(t_mod *data)
 {
 	int i;
@@ -140,12 +192,13 @@ void draw_x_axis(t_mod *data)
 		while (j < data->cols - 1)
 		{
 			k = data->line_size;
-			while (k >= 0)	
+			draw_between_points(data);
+			/*while (k >= 0)	
 			{
 				mlx_pixel_put(data->mlx, data->win, data->x, data->y, 0xFF0000);
 				k--;
 				data->x++;
-			}
+			}*/
 			j++;
 		}
 		data->y = data->y + data->line_size;
