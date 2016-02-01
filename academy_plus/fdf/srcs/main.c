@@ -6,21 +6,19 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/01 16:29:58 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/01 20:06:37 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 //------------THE FUN BEGINS HERE--------
-
 void	init_struct(t_mod *data)
 {
 	data->rows = 0;
 	data->cols = 0;
 	data->error = 0;
-	data->x = 100;
-	data->y = 500;
+	data->times = 0;
 }
 
 //--------------ADDING THE NEW ROW FROM THE CHAR MATRIX--------
@@ -181,6 +179,48 @@ void	draw_line_axis(t_mod *data)
 	data->y = data->y1;
 }
 
+void	save_old_coords(t_mod *data)
+{
+	data->old_x = data->x;
+	data->old_y = data->y;
+}
+
+void	get_new_coord(t_mod *data)
+{
+	save_old_coords(data);
+	data->x1 = WIDTH / 2 + data->x * data->line_size * cos(30) - \
+			   data->y * data->line_size - cos(30);
+	data->y1 = HEIGHT / 2 + data->x * data->line_size * sin(30) + \
+			   data->y * data->line_size * sin(30) - data->z * data->line_size;
+	//draw_line_axis(data);
+}
+
+
+void	reset_x_coord(t_mod *data)
+{
+	/*if (data->times != 0)
+	{
+		data->x = data->x1;
+		data->y = data->y1;
+	}
+	else*/
+		data->x = data->old_x + data->line_size * data->times;
+		data->y = data->old_y;
+	data->times = 0;
+}
+
+void	reset_y_coord(t_mod *data)
+{
+	/*if (data->times != 0)
+	{
+		data->x = data->x1;
+		data->y = data->y1;
+	}
+	else*/
+		data->x = data->old_x;
+		data->y = data->old_y + data->line_size * data->times;
+	data->times = 0;
+}
 
 //-----------------DRAWING HORIZONTALLY-------------------
 
@@ -190,16 +230,31 @@ void draw_x_axis(t_mod *data)
 	int j;
 
 	i = 0;
-	data->y = 500;
+	data->y = 500 - data->rows / 2 * data->line_size;
 	while (i < data->rows)
 	{
 		j = 0;
-		data->x = 100;
+		data->x = 500 - data->cols / 2 * data->line_size; 
 		while (j < data->cols - 1)
 		{
-			data->x1 = data->x + data->line_size;
-			data->y1 = data->y;
+			data->z = data->matrix[i][j];
+			save_old_coords(data);
+			if (data->z != 0)
+			{
+				data->times++;
+				get_new_coord(data);	
+				/*data->x = data->x1 + data->line_size;
+				data->y = data->y1;*/
+			}
+			else
+			{
+				data->times = 0;	
+				data->x1 = data->x + data->line_size;
+				data->y1 = data->y;
+			}
 			draw_line_axis(data);
+			if (data->z != 0)
+				reset_x_coord(data);
 			j++;
 		}
 		data->y = data->y + data->line_size;
@@ -215,16 +270,31 @@ void	draw_y_axis(t_mod *data)
 	int j;
 
 	i = 0;
-	data->x = 100;
+	data->x = 500 - data->cols / 2 * data->line_size; 
 	while (i < data->cols)
 	{
 		j = 0;
-		data->y = 500;
+		data->y = 500 - data->rows / 2 * data->line_size;
 		while (j < data->rows - 1)
 		{
-			data->y1 = data->y + data->line_size;
-			data->x1 = data->x;
+			data->z = data->matrix[j][i];
+			save_old_coords(data);
+			if (data->z != 0)
+			{
+				data->times++;
+				get_new_coord(data);
+				/*data->x = data->x1;
+				data->y = data->y1 + data->line_size;*/
+			}
+			else
+			{
+				data->times = 0;
+				data->y1 = data->y + data->line_size;
+				data->x1 = data->x;
+			}
 			draw_line_axis(data);
+			if (data->z != 0)
+				reset_y_coord(data);
 			j++;
 		}
 		data->x = data->x + data->line_size;
