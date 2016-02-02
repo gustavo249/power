@@ -6,17 +6,28 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/25 14:24:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/01/30 19:08:47 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/02 18:29:15 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-#include "mlx.h"
-#include <unistd.h>
-#include <stdio.h>
+# include "mlx.h"
+# include <unistd.h>
+# include <stdio.h>
 # include "libft.h"
+# include <math.h>
+# define WIDTH 1000
+# define HEIGHT 1000
+# define DEG30 0.52398776
+
+typedef struct s_point
+{
+	float	x;
+	float	y;
+	float	z;
+}				t_point;
 
 typedef struct	s_env
 {
@@ -25,14 +36,14 @@ typedef struct	s_env
 	int			rows;
 	int			cols;
 	int			**matrix;
+	t_point		**m2;
 	int			error;
 	char		**content;
-	int			line_size;
+	float		line_size;
 	float		old_x;
 	float		old_y;
-	float		x;
-	float		y;
-	float		z;
+	float		x1;
+	float		y1;
 }				t_mod;
 
 #endif
