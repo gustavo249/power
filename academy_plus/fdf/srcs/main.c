@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/02 18:59:10 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/02 19:42:05 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,8 +237,8 @@ void	transform_all_points_relative_to_map_center(t_mod *m)
 	}
 }
 
-//-----------------DRAWING HORIZONTALLY-------------------
 
+//--------------DRAWING CORE------------------
 
 void	draw(t_mod *data)
 {
@@ -267,7 +267,18 @@ int key_hook(int keycode, t_mod *data)
 
 void	get_size(t_mod *data)
 {
-	data->line_size = (WIDTH - 600) / data->cols;
+	if (data->cols > 100)
+		data->line_size = (WIDTH - 300) / data->cols;
+	else if (data->cols > 70)
+		data->line_size = (WIDTH - 500) / data->cols;
+	else if (data->cols >= 20)
+		data->line_size = (WIDTH - 850) / data->cols;
+	else if (data->cols > 10)
+		data->line_size = (WIDTH - 600) / data->cols;
+	else
+		data->line_size = (WIDTH - 950) / data->cols;
+	
+
 }
 
 //------------EXPOSE HOOK CALLED FUNCTION-----------
@@ -298,7 +309,10 @@ int main (int argc, char **argv)
 	int		fd;
 
 	if (argc != 2)
+	{
+		ft_putstr("No input file or too many\n");
 		return (-1);
+	}
 	fd = open (argv[1], O_RDONLY);
 	init_struct(&data);
 	read_matrix(fd, &data);

@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/25 14:24:57 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/02 18:29:15 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/02 19:11:38 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,6 @@ typedef struct	s_env
 	int			error;
 	char		**content;
 	float		line_size;
-	float		old_x;
-	float		old_y;
-	float		x1;
-	float		y1;
 }				t_mod;
 
 #endif
