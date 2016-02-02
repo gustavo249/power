@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/01 20:06:37 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/02 18:59:10 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	init_struct(t_mod *data)
 	data->rows = 0;
 	data->cols = 0;
 	data->error = 0;
-	data->times = 0;
 }
 
 //--------------ADDING THE NEW ROW FROM THE CHAR MATRIX--------
@@ -68,21 +67,6 @@ int		**add_new_row(t_mod *data)
 	return (new_matrix);
 }
 
-
-//----OPTIONAL PRINTING--------
-
-void	print_matrix(t_mod *data)
-{
-	int i, j;
-
-	for (i = 0; i < data->rows; i++)
-	{
-		for (j = 0; j < data->cols; j++)
-			printf(" %d", data->matrix[i][j]);
-		printf("\n");
-	}
-}
-
 //-------------ADDING JUST THE FIRST ROW FOR COMPARISON-------------
 
 int		**add_first_row(t_mod *data, int fd)
@@ -130,182 +114,141 @@ int		read_matrix(int fd, t_mod *data)
 		data->rows++;
 		data->matrix = add_new_row(data);
 	}
-	print_matrix(data);
-
-	printf("ROWS = %d\tCOLS =%d\n", data->rows, data->cols);
 	return (1);
 }
 
-//----------------DRAWING FROM OLD POINTS TO NEW POINTS BASED ON HEIGHT-----------
 
-/*
-void	draw_between_points(t_mod *data)
-{
-	data->old_x = data->x;
-	data->old_y = data->y;
-	if (data->z > 0)
-	{
-		data->new_x = data->x / data->z;
-		data->new_y = data->y / data->z;
-	}
-	else
-	{
-		data->new_x = data->x + data->line_size - 1;
-		data->new_y = data->y + data->line_size + 1;
-	}
-	
-}
-*/
+//------------BASIC FUNCTION WHICH DRAWS A SINGLE LINE FROM X Y TO X1 AND Y1-----------
 
-//------------FUNCTIA NUTS--------------
-
-void	draw_line_axis(t_mod *data)
+void	draw_line_axis(t_mod *data, t_point v, t_point v1)
 {
 	float	t;
 	float	step;
 	float	x;
 	float	y;
 
-	step = 1 / (fmax(fabs(data->x1 - data->x), fabs(data->y1 - data->y)));
+	step = 1 / (fmax(fabs(v1.x - v.x), fabs(v1.y - v.y)));
 	t = 0;
 	while (t < 1)
 	{
-		x = data->x + t * (data->x1 - data->x);
-		y = data->y + t * (data->y1 - data->y);
+		x = v.x + t * (v1.x - v.x);
+		y = v.y + t * (v1.y - v.y);
 		mlx_pixel_put(data->mlx, data->win, x, y, 0xFF0000);
 		t = t + step;
 	}
-	data->x = data->x1;
-	data->y = data->y1;
 }
 
-void	save_old_coords(t_mod *data)
-{
-	data->old_x = data->x;
-	data->old_y = data->y;
-}
+//-------------------DRAW A LINE BETWEEN EACH POINT IN THE MATRIX--------------
 
-void	get_new_coord(t_mod *data)
+void	draw_between_points(t_mod *data, t_point **matrix)
 {
-	save_old_coords(data);
-	data->x1 = WIDTH / 2 + data->x * data->line_size * cos(30) - \
-			   data->y * data->line_size - cos(30);
-	data->y1 = HEIGHT / 2 + data->x * data->line_size * sin(30) + \
-			   data->y * data->line_size * sin(30) - data->z * data->line_size;
-	//draw_line_axis(data);
-}
+	int i;
+	int j;
 
-
-void	reset_x_coord(t_mod *data)
-{
-	/*if (data->times != 0)
+	i = 0;
+	while (i < data->rows)
 	{
-		data->x = data->x1;
-		data->y = data->y1;
+		j = 0;
+		while (j < data->cols)
+		{
+			if (j < data->cols - 1)
+				draw_line_axis(data, matrix[i][j], matrix[i][j + 1]);
+			if (i < data->rows - 1)
+				draw_line_axis(data, matrix[i][j], matrix[i + 1][j]);
+			j++;
+		}
+		i++;
 	}
-	else*/
-		data->x = data->old_x + data->line_size * data->times;
-		data->y = data->old_y;
-	data->times = 0;
 }
 
-void	reset_y_coord(t_mod *data)
+//----------------------GETTING X AND Y COORDS BASED ON ROWS AND COLUMNS----------------
+
+t_point		**get_initial_coords(t_mod *data)
 {
-	/*if (data->times != 0)
+	t_point		**temp;
+	int			i;
+	int			j;
+
+	i = 0;
+	temp = (t_point**)malloc(sizeof(t_point*) * data->rows);
+	while (i < data->rows)
 	{
-		data->x = data->x1;
-		data->y = data->y1;
+		temp[i]= (t_point*)malloc(sizeof(t_point) * data->cols);
+		j = 0;
+		while (j < data->cols)
+		{
+			temp[i][j].x = j;
+			temp[i][j].y = i;
+			temp[i][j].z = data->matrix[i][j];
+			j++;
+		}
+		i++;
 	}
-	else*/
-		data->x = data->old_x;
-		data->y = data->old_y + data->line_size * data->times;
-	data->times = 0;
+	return (temp);
+}
+
+//---------------------CREATING A MATRIX STRUCTURE WHICH CONTAINS X Y AND Z COORDS BASED ON HIGHT--------
+
+t_point		**get_isometric_coords(t_mod *data)
+{
+	t_point		**matrix;
+	int 		i;
+	int			j;
+
+	i = 0;
+	matrix = (t_point**)malloc(sizeof(t_point*) * data->rows);
+	while (i < data->rows)
+	{
+		j = 0;
+		matrix[i] = (t_point*)malloc(sizeof(t_point) * data->cols);
+		while (j < data->cols)
+		{
+			matrix[i][j].x = WIDTH / 2 + data->m2[i][j].x * data->line_size * cos(DEG30) - \
+							 data->m2[i][j].y * data->line_size * cos(DEG30);
+			matrix[i][j].y = HEIGHT / 2 + data->m2[i][j].x * data->line_size * sin(DEG30) + \
+							 data->m2[i][j].y * data->line_size * sin(DEG30) - \
+							 data->m2[i][j].z * data->line_size;
+			matrix[i][j].z = data->m2[i][j].z;
+			j++;
+		}
+		i++;
+	}
+	return (matrix);
+}
+
+//------------------CENTRE THE COORDINATES IN THE MIDDLE--------------
+
+void	transform_all_points_relative_to_map_center(t_mod *m)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < m->rows)
+	{
+		j = 0;
+		while (j < m->cols)
+		{
+			(m->m2)[i][j].x -= (m->cols / 2);
+			(m->m2)[i][j].y -= (m->rows / 2);
+			j++;
+		}
+		i++;
+	}
 }
 
 //-----------------DRAWING HORIZONTALLY-------------------
 
-void draw_x_axis(t_mod *data)
-{
-	int i;
-	int j;
-
-	i = 0;
-	data->y = 500 - data->rows / 2 * data->line_size;
-	while (i < data->rows)
-	{
-		j = 0;
-		data->x = 500 - data->cols / 2 * data->line_size; 
-		while (j < data->cols - 1)
-		{
-			data->z = data->matrix[i][j];
-			save_old_coords(data);
-			if (data->z != 0)
-			{
-				data->times++;
-				get_new_coord(data);	
-				/*data->x = data->x1 + data->line_size;
-				data->y = data->y1;*/
-			}
-			else
-			{
-				data->times = 0;	
-				data->x1 = data->x + data->line_size;
-				data->y1 = data->y;
-			}
-			draw_line_axis(data);
-			if (data->z != 0)
-				reset_x_coord(data);
-			j++;
-		}
-		data->y = data->y + data->line_size;
-		i++;
-	}
-}
-
-//--------------------DRAWING VERTICALLY ---------------
-
-void	draw_y_axis(t_mod *data)
-{
-	int i;
-	int j;
-
-	i = 0;
-	data->x = 500 - data->cols / 2 * data->line_size; 
-	while (i < data->cols)
-	{
-		j = 0;
-		data->y = 500 - data->rows / 2 * data->line_size;
-		while (j < data->rows - 1)
-		{
-			data->z = data->matrix[j][i];
-			save_old_coords(data);
-			if (data->z != 0)
-			{
-				data->times++;
-				get_new_coord(data);
-				/*data->x = data->x1;
-				data->y = data->y1 + data->line_size;*/
-			}
-			else
-			{
-				data->times = 0;
-				data->y1 = data->y + data->line_size;
-				data->x1 = data->x;
-			}
-			draw_line_axis(data);
-			if (data->z != 0)
-				reset_y_coord(data);
-			j++;
-		}
-		data->x = data->x + data->line_size;
-		i++;
-	}
-}
 
 void	draw(t_mod *data)
 {
-	draw_x_axis(data);
-	draw_y_axis(data);
+	t_point **matrix;
+
+	data->m2 = get_initial_coords(data);
+	transform_all_points_relative_to_map_center(data);
+	matrix = get_isometric_coords(data);
+	draw_between_points(data, matrix);
+
 }
 
 //-----------EXIT WHEN ESC KEY IS PRESSED-------------
@@ -324,16 +267,7 @@ int key_hook(int keycode, t_mod *data)
 
 void	get_size(t_mod *data)
 {
-	if (data->rows < 10 || data->cols < 10)
-		data->line_size = 20;
-	else if (data->rows < 30 || data->cols < 30)
-		data->line_size = 15;
-	else if (data->rows < 50 || data->cols < 50)
-		data->line_size = 10;
-	else if (data->rows < 100 || data->cols < 100)
-		data->line_size = 8;
-	else if (data->rows > 100 || data->cols > 100)
-		data->line_size = 3;
+	data->line_size = (WIDTH - 600) / data->cols;
 }
 
 //------------EXPOSE HOOK CALLED FUNCTION-----------
@@ -350,9 +284,10 @@ int		draw_matrix(t_mod *data)
 void	draw_map(t_mod *data)
 {
 	data->mlx = mlx_init();
-	data->win = mlx_new_window(data->mlx, 1000, 1000, "win");
+	data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "win");
 	mlx_key_hook(data->win, key_hook, data);
 	mlx_expose_hook(data->win, draw_matrix, data);
+	get_size(data);
 	mlx_loop(data->mlx);
 	sleep(10);
 }
