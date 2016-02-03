@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/03 14:28:43 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/03 16:08:06 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	init_struct(t_mod *data)
 	data->error = 0;
 	data->min_z = 0;
 	data->max_z = 0;
-	data->white = 0x00FF00;
+	data->white = 0xFF0000;
 }
 
 //--------------ADDING THE NEW ROW FROM THE CHAR MATRIX--------
@@ -149,16 +149,12 @@ void	get_min_max_height(t_mod *data)
 
 int		get_color(t_mod *data)
 {
-	int red;
 	int v;
-	int white;
 	float height_size;
 
-	white = 0xFFFFFF;
-	red = 0xFF0000;
 	height_size = data->max_z - data->min_z;
 	v = height_size / HEIGHT * 255;
-	data->white -= v - 5;
+	data->white -= v - 10;
 	return (data->white);
 }
 
@@ -273,8 +269,8 @@ void	transform_all_points_relative_to_map_center(t_mod *m)
 		j = 0;
 		while (j < m->cols)
 		{
-			(m->m2)[i][j].x -= (m->cols / 2);
-			(m->m2)[i][j].y -= (m->rows / 2);
+			m->m2[i][j].x -= (m->cols / 2);
+			m->m2[i][j].y -= (m->rows / 2);
 			j++;
 		}
 		i++;
@@ -414,7 +410,11 @@ int main (int argc, char **argv)
 	}
 	fd = open (argv[1], O_RDONLY);
 	init_struct(&data);
-	read_matrix(fd, &data);
+	if (read_matrix(fd, &data) < 0)
+	{
+		ft_putstr("Invalid map\n");
+		return (-1);
+	}
 	draw_map(&data);	
 	close(fd);
 	return (0);
