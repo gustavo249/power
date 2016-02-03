@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/03 16:08:06 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/03 16:18:41 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -405,10 +405,15 @@ int main (int argc, char **argv)
 
 	if (argc != 2)
 	{
-		ft_putstr("No input file or too many\n");
+		ft_putstr("No input file or too many files given\n");
 		return (-1);
 	}
-	fd = open (argv[1], O_RDONLY);
+	fd = open(argv[1], O_RDONLY);
+	if (fd < 0)
+	{
+		perror(argv[1]);
+		return (-1);
+	}
 	init_struct(&data);
 	if (read_matrix(fd, &data) < 0)
 	{
