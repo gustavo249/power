@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/28 13:00:38 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/02 19:42:05 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/03 14:28:43 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ void	init_struct(t_mod *data)
 	data->rows = 0;
 	data->cols = 0;
 	data->error = 0;
+	data->min_z = 0;
+	data->max_z = 0;
+	data->white = 0x00FF00;
 }
 
 //--------------ADDING THE NEW ROW FROM THE CHAR MATRIX--------
@@ -47,7 +50,6 @@ int		**add_new_row(t_mod *data)
 {
 	int		**new_matrix;
 	int		i;
-	int		k;
 	int		j;
 
 	i = 0;
@@ -118,6 +120,48 @@ int		read_matrix(int fd, t_mod *data)
 }
 
 
+
+//------------MIN HEIGHT AND MAX HEIGHT---------------
+
+
+void	get_min_max_height(t_mod *data)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < data->rows)
+	{
+		j = 0;
+		while (j < data->cols)
+		{
+			if (data->m2[i][j].z > data->max_z)
+				data->max_z = data->m2[i][j].z;
+			if (data->m2[i][j].z < data->min_z)
+				data->min_z = data->m2[i][j].z;
+			j++;
+		}
+		i++;
+	}
+}
+
+//--------------GET COLOR------------------------------
+
+int		get_color(t_mod *data)
+{
+	int red;
+	int v;
+	int white;
+	float height_size;
+
+	white = 0xFFFFFF;
+	red = 0xFF0000;
+	height_size = data->max_z - data->min_z;
+	v = height_size / HEIGHT * 255;
+	data->white -= v - 5;
+	return (data->white);
+}
+
 //------------BASIC FUNCTION WHICH DRAWS A SINGLE LINE FROM X Y TO X1 AND Y1-----------
 
 void	draw_line_axis(t_mod *data, t_point v, t_point v1)
@@ -133,7 +177,7 @@ void	draw_line_axis(t_mod *data, t_point v, t_point v1)
 	{
 		x = v.x + t * (v1.x - v.x);
 		y = v.y + t * (v1.y - v.y);
-		mlx_pixel_put(data->mlx, data->win, x, y, 0xFF0000);
+		mlx_pixel_put(data->mlx, data->win, x, y, get_color(data));
 		t = t + step;
 	}
 }
@@ -237,6 +281,55 @@ void	transform_all_points_relative_to_map_center(t_mod *m)
 	}
 }
 
+void	control_height(t_mod *data)
+{
+	int i;
+	int j;
+	float k;
+
+	i = 0;
+	k = 0;
+	while (i < data->rows)
+	{
+		j = 0;
+		while (j < data->cols)
+		{
+			if (data->m2[i][j].z < 0)
+				k = data->m2[i][j].z * -1;
+			else
+				k = data->m2[i][j].z;
+			if (k >= 40)
+				data->m2[i][j].z /= 10;
+			else if (k >= 20)
+				data->m2[i][j].z /= 6;
+			else
+				data->m2[i][j].z /= 4;
+			j++;
+		}
+		i++;
+	}
+}
+
+void	modify_z(t_mod *data, int control)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < data->rows)
+	{
+		j = 0;
+		while (j < data->cols)
+		{
+			if (control == 1)
+				data->m2[i][j].z *= 2;
+			else if (control == -1)
+				data->m2[i][j].z /= 2;
+			j++;
+		}
+		i++;
+	}
+}
 
 //--------------DRAWING CORE------------------
 
@@ -245,7 +338,9 @@ void	draw(t_mod *data)
 	t_point **matrix;
 
 	data->m2 = get_initial_coords(data);
+	get_min_max_height(data);
 	transform_all_points_relative_to_map_center(data);
+	control_height(data);
 	matrix = get_isometric_coords(data);
 	draw_between_points(data, matrix);
 
@@ -253,12 +348,24 @@ void	draw(t_mod *data)
 
 //-----------EXIT WHEN ESC KEY IS PRESSED-------------
 
+int	draw_matrix(t_mod *data);
+
 int key_hook(int keycode, t_mod *data)
 {
 	if (keycode == 53)
 	{
 		mlx_destroy_window(data->mlx, data->win);
 		exit(0);
+	}
+	else if (keycode == 126)
+	{
+		modify_z(data, 1);
+		draw_matrix(data);
+	}
+	else if (keycode == 125)
+	{
+		modify_z(data, -1);
+		draw_matrix(data);
 	}
 	return (0);
 }
@@ -269,15 +376,8 @@ void	get_size(t_mod *data)
 {
 	if (data->cols > 100)
 		data->line_size = (WIDTH - 300) / data->cols;
-	else if (data->cols > 70)
-		data->line_size = (WIDTH - 500) / data->cols;
-	else if (data->cols >= 20)
-		data->line_size = (WIDTH - 850) / data->cols;
-	else if (data->cols > 10)
-		data->line_size = (WIDTH - 600) / data->cols;
 	else
-		data->line_size = (WIDTH - 950) / data->cols;
-	
+		data->line_size = (WIDTH - 600) / data->cols;
 
 }
 
@@ -295,10 +395,9 @@ int		draw_matrix(t_mod *data)
 void	draw_map(t_mod *data)
 {
 	data->mlx = mlx_init();
-	data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "win");
-	mlx_key_hook(data->win, key_hook, data);
+	data->win = mlx_new_window(data->mlx, WIDTH, HEIGHT, "win");	
 	mlx_expose_hook(data->win, draw_matrix, data);
-	get_size(data);
+	mlx_key_hook(data->win, key_hook, data);
 	mlx_loop(data->mlx);
 	sleep(10);
 }
