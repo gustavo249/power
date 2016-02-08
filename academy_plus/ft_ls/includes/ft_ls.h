@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/06 11:58:01 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/08 17:50:47 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/08 20:04:02 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,13 @@ struct	k_list
 	char	*oth_rights;
 	p_list	*next;
 };
+
+p_list  *add_link(p_list *list, char *data);
+p_list  *sort_list(p_list **begin_list);
+void    check_file_type(p_list **begin_list);
+void    list_content(DIR *fd);
+void    compute_dirs(p_list **begin_list);
+int     validate_dirs(p_list **begin_list);
+void    print_list(p_list *list);
 
 #endif

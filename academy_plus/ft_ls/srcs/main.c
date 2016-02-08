@@ -6,17 +6,17 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/08 15:09:04 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/08 18:08:55 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/08 20:14:11 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ls.h"
+#include "../includes/ft_ls.h"
 
 p_list	*add_link(p_list *list, char *data)
 {
 	p_list *new;
 
-	new = malloc(sizeof(t_list));
+	new = malloc(sizeof(p_list));	
 	if (new != NULL)
 	{
 		new->name = data;
@@ -35,6 +35,30 @@ void	print_list(p_list *list)
 	}
 }
 
+//------------------SORT LIST------------------
+
+p_list	*sort_list(p_list **begin_list)
+{
+	p_list *list;
+	char	*aux;
+
+	list = *begin_list;
+	while (list->next)
+	{
+		if (ft_strcmp(list->name, list->next->name) > 0)
+		{
+			aux = list->name;
+			list->name = list->next->name;
+			list->next->name = aux;
+			list = *begin_list;
+		}
+		else
+			list = list->next;
+	}
+	list = *begin_list;
+	return (list);
+}
+
 //--------------CHECK FILE TYPES AND ADD IT TO STRUCTURE-----------
 
 void	check_file_type(p_list **begin_list)
@@ -49,13 +73,64 @@ void	check_file_type(p_list **begin_list)
 		r = stat(list->name, &info);
 		if (r == 0)
 		{
-			if (S_ISREG(info->st_mode))
+			if (S_ISREG(info.st_mode))
 				list->type = '-';
+			else if (S_ISDIR(info.st_mode))
+				list->type = 'd';
+			else if (S_ISCHR(info.st_mode))
+				list->type = 'c';
+			else if (S_ISBLK(info.st_mode))
+				list->type = 'b';
+			else if (S_ISFIFO(info.st_mode))
+				list->type = 'p';
+			else if (S_ISLNK(info.st_mode))
+				list->type = 'l';
+			else if (S_ISSOCK(info.st_mode))
+				list->type = 's';
 		}
+		else
+			perror(list->name);
+		list = list->next;
 	}
 }
 
-int		validate_arguments(p_list **begin_list)
+//-------------------LIST DIRECTORY CONTENT--------------
+
+void	list_content(DIR *fd)
+{
+	struct dirent *buff;
+	p_list		*content;
+
+	while ((buff = readdir(fd)) != NULL)
+		content = add_link(content, buff->d_name);
+	sort_list(&content);
+	while (content)
+	{
+		ft_putendl(content->name);
+		content = content->next;
+	}
+	free(content);
+}
+
+void	compute_dirs(p_list **begin_list)
+{
+	p_list *list;
+	DIR		*fd;
+
+
+	list = *begin_list;
+	while (list)
+	{
+		fd = opendir(list->name);
+		if (fd != NULL)
+		{
+			list_content(fd);
+		}
+		list = list->next;
+	}
+}
+
+int		validate_dirs(p_list **begin_list)
 {
 	DIR		*fd;
 	p_list	*list;
@@ -79,7 +154,7 @@ int		validate_arguments(p_list **begin_list)
 		list = list->next;
 	}
 	if (ok == 1)
-		return (2);
+		return (1);
 	return (0);
 }
 
@@ -90,14 +165,17 @@ int		main(int argc, char **argv)
 
 	list = NULL;
 	i = argc - 1;
+
 	while (i > 0)
 	{
 		list = add_link(list, argv[i]);
 		i--;
 	}
+	list = sort_list(&list);	
 	//print_list(list);
 	check_file_type(&list);
-	if (validate_arguments(&list) == 2)
+	if (validate_dirs(&list) == 2)
 		return (2);
+	compute_dirs(&list);
 	return (0);
 }

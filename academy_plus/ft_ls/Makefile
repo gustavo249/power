@@ -6,13 +6,13 @@
 #    By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/02/06 11:42:35 by rcrisan           #+#    #+#              #
-#    Updated: 2016/02/06 12:08:47 by rcrisan          ###   ########.fr        #
+#    Updated: 2016/02/08 20:16:18 by rcrisan          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_ls
 
-SRCS = srcs/*.c
+SRCS = srcs/main.c
 
 OBJ = *.o
 
