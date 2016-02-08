@@ -5,98 +5,99 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/02/06 11:56:30 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/06 18:56:38 by rcrisan          ###   ########.fr       */
+/*   Created: 2016/02/08 15:09:04 by rcrisan           #+#    #+#             */
+/*   Updated: 2016/02/08 18:08:55 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ft_ls.h"
+#include "ft_ls.h"
 
-void	list_info(char	*name)
-{	
-	struct passwd	*id;
-	struct group	*gr;
-	struct stat		info;
-	time_t 			t;
-	char			*our_time;
+p_list	*add_link(p_list *list, char *data)
+{
+	p_list *new;
+
+	new = malloc(sizeof(t_list));
+	if (new != NULL)
+	{
+		new->name = data;
+		new->next = list;
+	}
+	return (new);
+}
+
+void	print_list(p_list *list)
+{
+	while (list != NULL)
+	{
+		ft_putstr(list->name);
+		ft_putchar('\n');
+		list = list->next;
+	}
+}
+
+//--------------CHECK FILE TYPES AND ADD IT TO STRUCTURE-----------
+
+void	check_file_type(p_list **begin_list)
+{
+	p_list *list;
+	struct stat info;
 	int r;
 
-	r = stat(name, &info);
-	our_time = malloc(100);
-	if (r == 0)
+	list = *begin_list;
+	while (list)
 	{
-		id = getpwuid(info.st_uid);
-		gr = getgrgid(info.st_gid);
-		t = time(&info.st_mtime);
-		our_time = ctime(&t);
-		if (id->pw_name == NULL)
-			printf("NULL PIZDA!\n");
-		else
+		r = stat(list->name, &info);
+		if (r == 0)
 		{
-			printf("NAME = %s\n", id->pw_name);
-			printf("GROUP NAME = %s\n", gr->gr_name);	
-			ft_putstr("\nnumber of hard links = ");
-			ft_putnbr(info.st_nlink);
-			ft_putstr("\ntotal size, in bytes = ");
-			ft_putnbr(info.st_size);
-			ft_putstr("\nTIME = ");
-			ft_putstr(our_time);
+			if (S_ISREG(info->st_mode))
+				list->type = '-';
 		}
-		printf("\n\nFILE = %s\n", name);
-		ft_putstr("\nID of device containing file = ");
-		ft_putnbr(info.st_dev);
-		ft_putstr("\ninode number = ");
-		ft_putnbr(info.st_ino);
-		ft_putstr("\nprotection = ");
-		ft_putnbr(info.st_mode);
-		ft_putstr("\nuser ID of owner = ");
-		ft_putnbr(info.st_uid);
-		ft_putstr("\ngroup ID of owner = ");
-		ft_putnbr(info.st_gid);
-		ft_putstr("\ndevice ID (if special file) = ");
-		ft_putnbr(info.st_rdev);
-		ft_putstr("\nblocksize for filesystem I/O = ");
-		ft_putnbr(info.st_blksize);
-		ft_putstr("\nnumber of 512B blocks allocated = ");
-		ft_putnbr(info.st_blocks);
-		ft_putstr("\ntime of last access = ");
-		ft_putnbr(info.st_atime);
-		ft_putstr("\ntime of last data modification = ");
-		ft_putnbr(info.st_mtime);
-		printf("\n\n--------END FILE---------\n\n");
 	}
-	else
-		ft_putstr("error\n");
+}
+
+int		validate_arguments(p_list **begin_list)
+{
+	DIR		*fd;
+	p_list	*list;
+	int		ok;
+
+	list = *begin_list;
+	ok = 0;
+	while (list)
+	{
+		if (list->type == 'd')
+		{
+			fd = opendir(list->name);
+			if (fd == NULL)
+			{
+				perror(list->name);
+				ok = 1;
+			}
+			else
+				closedir(fd);
+		}
+		list = list->next;
+	}
+	if (ok == 1)
+		return (2);
+	return (0);
 }
 
 int		main(int argc, char **argv)
 {
-	DIR				*fd;
-	struct dirent	*buff;
-	char 			*name;
+	p_list	*list;
+	int		i;
 
-	name = malloc(100);
-	if (argc != 2)
+	list = NULL;
+	i = argc - 1;
+	while (i > 0)
 	{
-		ft_putchar('\n');
-		return (0);
+		list = add_link(list, argv[i]);
+		i--;
 	}
-	fd = opendir(argv[1]);
-	if (fd == NULL)
-	{
-		perror(argv[1]);
-	}
-	else
-	{
-		while (1)
-		{
-			buff = readdir(fd);
-			if (!buff)
-				break;
-			name = buff->d_name;
-			list_info(name);
-		}
-		closedir(fd);
-	}
+	//print_list(list);
+	check_file_type(&list);
+	if (validate_arguments(&list) == 2)
+		return (2);
 	return (0);
 }
