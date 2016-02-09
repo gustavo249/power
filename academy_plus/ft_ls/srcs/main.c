@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/08 15:09:04 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/08 20:14:11 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/09 15:27:18 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ p_list	*add_link(p_list *list, char *data)
 {
 	p_list *new;
 
-	new = malloc(sizeof(p_list));	
+	new = malloc(sizeof(p_list));
 	if (new != NULL)
 	{
-		new->name = data;
+		new->name = ft_strdup(data);
 		new->next = list;
 	}
 	return (new);
@@ -27,10 +27,9 @@ p_list	*add_link(p_list *list, char *data)
 
 void	print_list(p_list *list)
 {
-	while (list != NULL)
+	while (list)
 	{
-		ft_putstr(list->name);
-		ft_putchar('\n');
+		ft_putendl(list->name);
 		list = list->next;
 	}
 }
@@ -58,6 +57,7 @@ p_list	*sort_list(p_list **begin_list)
 	list = *begin_list;
 	return (list);
 }
+
 
 //--------------CHECK FILE TYPES AND ADD IT TO STRUCTURE-----------
 
@@ -100,31 +100,42 @@ void	list_content(DIR *fd)
 {
 	struct dirent *buff;
 	p_list		*content;
+	char		**files;
 
+	content = NULL;
+	int i = 0;
 	while ((buff = readdir(fd)) != NULL)
+	{
+		errno = 0;
 		content = add_link(content, buff->d_name);
-	sort_list(&content);
+	}
+	if (errno != 0)
+		ft_putstr("erro\n");
+	content = sort_list(&content);
 	while (content)
 	{
 		ft_putendl(content->name);
 		content = content->next;
 	}
-	free(content);
+	//free(content);
 }
 
 void	compute_dirs(p_list **begin_list)
 {
 	p_list *list;
 	DIR		*fd;
-
+	struct dirent *buff;
+	p_list	*content;
 
 	list = *begin_list;
+	content = NULL;
 	while (list)
 	{
 		fd = opendir(list->name);
 		if (fd != NULL)
 		{
 			list_content(fd);
+			closedir(fd);
 		}
 		list = list->next;
 	}
@@ -154,7 +165,7 @@ int		validate_dirs(p_list **begin_list)
 		list = list->next;
 	}
 	if (ok == 1)
-		return (1);
+		return (2);
 	return (0);
 }
 
@@ -164,14 +175,14 @@ int		main(int argc, char **argv)
 	int		i;
 
 	list = NULL;
-	i = argc - 1;
+	i = 1;
 
-	while (i > 0)
+	while (i < argc)
 	{
 		list = add_link(list, argv[i]);
-		i--;
+		i++;
 	}
-	list = sort_list(&list);	
+	list = sort_list(&list);
 	//print_list(list);
 	check_file_type(&list);
 	if (validate_dirs(&list) == 2)
