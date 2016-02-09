@@ -6,11 +6,11 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/08 15:09:04 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/09 15:52:30 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/09 18:06:57 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ls.h"
+#include "../includes/ft_ls.h"
 
 p_list	*add_link(p_list *list, char *data)
 {
@@ -166,19 +166,55 @@ int		validate_dirs(p_list **begin_list)
 	return (0);
 }
 
+void	init_flags(t_mod *data)
+{
+	data->l_flag = 0;
+	data->r_flag = 0;
+	data->a_flag = 0;
+	data->br_flag = 0;
+	data->t_flag = 0;
+}
+
+void	set_flags(int args, char **argv, t_mod *data)
+{
+	int i;
+
+	i = 1;
+	while (i < args)
+	{
+		if (ft_strcmp(argv[i], "-l") == 0)
+			data->l_flag = 1;
+		else if (ft_strcmp(argv[i], "-r") == 0)
+			data->r_flag = 1;
+		else if (ft_strcmp(argv[i], "-a") == 0)
+			data->a_flag = 1;
+		else if (ft_strcmp(argv[i], "-R") == 0)
+			data->br_flag = 1;
+		else if (ft_strcmp(argv[i], "-t") == 0)
+			data->t_flag = 1;
+		else
+			i = args;
+		i++;
+	}
+}
+
 int		main(int argc, char **argv)
 {
 	p_list	*list;
+	t_mod	data;
 	int		i;
 
 	list = NULL;
 	i = 1;
-
+	if (argc == 1)
+		list = add_link(list, ".");
 	while (i < argc)
 	{
 		list = add_link(list, argv[i]);
 		i++;
 	}
+	init_flags(&data);
+	set_flags(argc, argv, &data);
 	list = sort_list(&list);
 	//print_list(list);
 	check_file_type(&list);
