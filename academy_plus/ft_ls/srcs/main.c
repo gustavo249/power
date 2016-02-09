@@ -6,11 +6,11 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/08 15:09:04 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/09 15:27:18 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/09 15:52:30 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ft_ls.h"
+#include "ft_ls.h"
 
 p_list	*add_link(p_list *list, char *data)
 {
@@ -100,10 +100,8 @@ void	list_content(DIR *fd)
 {
 	struct dirent *buff;
 	p_list		*content;
-	char		**files;
 
 	content = NULL;
-	int i = 0;
 	while ((buff = readdir(fd)) != NULL)
 	{
 		errno = 0;
@@ -124,7 +122,6 @@ void	compute_dirs(p_list **begin_list)
 {
 	p_list *list;
 	DIR		*fd;
-	struct dirent *buff;
 	p_list	*content;
 
 	list = *begin_list;
