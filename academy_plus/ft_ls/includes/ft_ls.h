@@ -6,7 +6,7 @@
 /*   By: rcrisan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/02/06 11:58:01 by rcrisan           #+#    #+#             */
-/*   Updated: 2016/02/09 17:45:51 by rcrisan          ###   ########.fr       */
+/*   Updated: 2016/02/13 19:51:34 by rcrisan          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ struct	k_list
 {
 	char	*name;
 	char	type;
+	struct stat info;
 	char	*usr_rights;
 	char	*grp_rights;
 	char	*oth_rights;
@@ -39,11 +40,15 @@ struct	k_list
 
 typedef struct s_mod
 {
+	struct passwd *id;
+	struct group *gr;
+	struct stat info;
 	int l_flag;
 	int r_flag;
 	int a_flag;
 	int br_flag;
 	int t_flag;
+	int n_parameters;
 
 }t_mod;
 
